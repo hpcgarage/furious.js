@@ -10,6 +10,7 @@
 #include "Strings.h"
 #include "IdMap.h"
 #include "Util.h"
+#include "portable-simd.h"
 
 typedef void (*ConstInitFunction)(uint32_t, double, void*);
 static void initConstF32(uint32_t length, double fillValue, float dataOut[restrict static length]);
@@ -22,6 +23,10 @@ static void initLinearF64(uint32_t samples, double start, double step, double da
 typedef void (*IdentityInitFunction)(uint32_t, uint32_t, int32_t, void*, double);
 static void initIdentityF32(uint32_t rows, uint32_t columns, int32_t diagonal, float data[restrict static rows*columns], double diagonalValue);
 static void initIdentityF64(uint32_t rows, uint32_t columns, int32_t diagonal, double data[restrict static rows*columns], double diagonalValue);
+
+typedef void (*RepeatFunction)(size_t, size_t, size_t, const void*, uint32_t, void*);
+static void repeatF32(size_t outerStride, size_t innerStride, size_t repeatLengthA, const float* dataA, uint32_t repeats, float* dataOut);
+static void repeatF64(size_t outerStride, size_t innerStride, size_t repeatLengthA, const double* dataA, uint32_t repeats, double* dataOut);
 
 static const ConstInitFunction constInitFunctions[] = {
 	[FJS_DataType_F64] = (ConstInitFunction) initConstF64,
@@ -36,6 +41,11 @@ static const StepInitFunction stepInitFunctions[] = {
 static const IdentityInitFunction identityInitFunctions[] = {
 	[FJS_DataType_F64] = (IdentityInitFunction) initIdentityF64,
 	[FJS_DataType_F32] = (IdentityInitFunction) initIdentityF32
+};
+
+static const RepeatFunction repeatFunctions[] = {
+	[FJS_DataType_F64] = (RepeatFunction) repeatF64,
+	[FJS_DataType_F32] = (RepeatFunction) repeatF32
 };
 
 enum FJS_Error FJS_Execute_CreateEmptyArray(PP_Instance instance,
@@ -411,6 +421,18 @@ enum FJS_Error FJS_Execute_Repeat(PP_Instance instance,
 		return FJS_Error_RepeatsOutOfRange;
 	}
 
+	/* Check that the data type is supported and choose the implementation for this data type */
+	RepeatFunction repeatFunction;
+	switch (dataTypeA) {
+		case FJS_DataType_F64:
+		case FJS_DataType_F32:
+			repeatFunction = repeatFunctions[dataTypeA];
+			break;
+		case FJS_DataType_Invalid:
+		default:
+			return FJS_Error_InvalidDataType;
+	}
+
 	/* Compute the length of the new array */
 	uint32_t lengthOut = lengthA;
 	if (!FJS_Util_Mul32u(lengthOut, repeats, &lengthOut)) {
@@ -497,17 +519,10 @@ enum FJS_Error FJS_Execute_Repeat(PP_Instance instance,
 	}
 
 	/* Do the computation */
+	
 	double* dataOut = FJS_NDArray_GetData(arrayOut);
-	for (size_t i = 0; i < outerStride; i++) {
-		for (size_t j = 0; j < repeatLengthA; j++) {
-			for (size_t k = 0; k < innerStride; k++) {
-				double valueA = dataA[(i * repeatLengthA + j) * innerStride + k];
-				for (size_t c = 0; c < repeats; c++) {
-					dataOut[((i * repeatLengthA + j) * repeats + c) * innerStride + k] = valueA;
-				}
-			}
-		}
-	}
+	
+	repeatFunction(outerStride, innerStride, repeatLengthA, dataA, repeats, dataOut);
 
 	/* De-allocate input array if needed */
 	if (idA < 0) {
@@ -647,6 +662,54 @@ static void initIdentityF64(uint32_t rows, uint32_t columns, int32_t diagonal, d
 		const uint32_t imax = FJS_Util_Min32u(rows + diagonal, columns);
 		for (uint32_t i = 0; i < imax; ++i) {
 			data[(i - diagonal)*columns+i] = diagonalValue;
+		}
+	}
+}
+
+static void repeatF32(size_t outerStride, size_t innerStride, size_t repeatLengthA, const float* dataA, uint32_t repeats, float* dataOut) {
+	if (innerStride == 1) {
+		/* SIMD-optimized version */
+		for (size_t i = 0; i < outerStride; i++) {
+			for (size_t j = 0; j < repeatLengthA; j++) {
+				float valueA = dataA[i * repeatLengthA + j];
+				v4sf vec = v4sf_splat(valueA);
+				size_t c = 0;
+
+				// if number of repeats is greater than or equal to 4, use SIMD vector
+				for (; c + 4 < repeats; c += 4) {
+					v4sf_store(dataOut + (i * repeatLengthA + j) * repeats + c, vec);
+				}
+				
+				//set up catch loop for when number of repeats < 4
+				for (; c < repeats; c++) {
+					dataOut[(i * repeatLengthA + j) * repeats + c] = valueA;
+				}
+			}
+		}		
+	} else {
+		for (size_t i = 0; i < outerStride; i++) {
+			for (size_t j = 0; j < repeatLengthA; j++) {
+				for (size_t k = 0; k < innerStride; k++) {
+					float valueA = dataA[(i * repeatLengthA + j) * innerStride + k];
+					for (size_t c = 0; c < repeats; c++) {
+						dataOut[((i * repeatLengthA + j) * repeats + c) * innerStride + k] = valueA;
+					}
+				}
+			}
+		}		
+	}
+
+}
+
+static void repeatF64(size_t outerStride, size_t innerStride, size_t repeatLengthA, const double* dataA, uint32_t repeats, double* dataOut) {
+	for (size_t i = 0; i < outerStride; i++) {
+		for (size_t j = 0; j < repeatLengthA; j++) {
+			for (size_t k = 0; k < innerStride; k++) {
+				double valueA = dataA[(i * repeatLengthA + j) * innerStride + k];
+				for (size_t c = 0; c < repeats; c++) {
+					dataOut[((i * repeatLengthA + j) * repeats + c) * innerStride + k] = valueA;
+				}
+			}
 		}
 	}
 }

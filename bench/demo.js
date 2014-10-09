@@ -8,7 +8,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([100, 100]);
 			var y = x.repeat(2, 0);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
@@ -30,7 +29,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([100, 1], new furious.DataType("f32"));
 			var y = x.repeat(3, 0);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
@@ -52,7 +50,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([1, 100]);
 			var y = x.repeat(2, 0);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
@@ -74,7 +71,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([100, 100]);
 			var y = x.repeat(2, 1);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
@@ -96,7 +92,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([100, 100, 50]);
 			var y = x.repeat(2, 2);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
@@ -118,7 +113,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([100, 1]);
 			var y = x.repeat(5, 1);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
@@ -140,7 +134,6 @@ furious.init(function(context) {
 		"fn": function(deferred) {
 			var x = context.ones([1, 100]);
 			var y = x.repeat(5, 1);
-			console.log("hello");
 			context.barrier(function (){
 				deferred.resolve();
 			});
