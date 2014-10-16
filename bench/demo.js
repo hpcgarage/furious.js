@@ -128,7 +128,7 @@ furious.init(function(context) {
 		}
 	}).run();
 
-	Benchmark("Repeat five times along x-axis in 1x100 array", {
+	Benchmark("Repeat five times along y-axis in 1x100 array", {
 		"defer": true,
 
 		"fn": function(deferred) {
@@ -148,5 +148,90 @@ furious.init(function(context) {
 			}
 		}
 	}).run();
+
+	Benchmark("Repeat five times along x-axis in 3-d array", {
+		"defer": true,
+
+		"fn": function(deferred) {
+			var x = context.ones([1000, 1000, 1000]);
+			var y = x.repeat(5, 0);
+			context.barrier(function (){
+				deferred.resolve();
+			});
+		},
+		"onComplete": function(event) {
+			if (typeof window !== "undefined") {
+				var output = document.getElementById("output");
+				output.appendChild(document.createTextNode(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms"));
+				output.appendChild(document.createElement("br"));
+			} else {
+				console.log(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms");
+			}
+		}
+	}).run();
+
+	Benchmark("Repeat four times along y-axis in 3-d array", {
+		"defer": true,
+
+		"fn": function(deferred) {
+			var x = context.ones([500, 500, 500]);
+			var y = x.repeat(4, 1);
+			context.barrier(function (){
+				deferred.resolve();
+			});
+		},
+		"onComplete": function(event) {
+			if (typeof window !== "undefined") {
+				var output = document.getElementById("output");
+				output.appendChild(document.createTextNode(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms"));
+				output.appendChild(document.createElement("br"));
+			} else {
+				console.log(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms");
+			}
+		}
+	}).run();
+
+	Benchmark("Repeat four times along y-axis in 3-d array", {
+		"defer": true,
+
+		"fn": function(deferred) {
+			var x = context.ones([500, 500, 500]);
+			var y = x.repeat(4, 1);
+			context.barrier(function (){
+				deferred.resolve();
+			});
+		},
+		"onComplete": function(event) {
+			if (typeof window !== "undefined") {
+				var output = document.getElementById("output");
+				output.appendChild(document.createTextNode(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms"));
+				output.appendChild(document.createElement("br"));
+			} else {
+				console.log(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms");
+			}
+		}
+	}).run();
+
+	Benchmark("Repeat ten times along x-axis in 1-d array", {
+		"defer": true,
+
+		"fn": function(deferred) {
+			var x = context.ones([1000, 1, 1]);
+			var y = x.repeat(10, 0);
+			context.barrier(function (){
+				deferred.resolve();
+			});
+		},
+		"onComplete": function(event) {
+			if (typeof window !== "undefined") {
+				var output = document.getElementById("output");
+				output.appendChild(document.createTextNode(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms"));
+				output.appendChild(document.createElement("br"));
+			} else {
+				console.log(this.name + ": " + (this.stats.mean * 1000).toFixed(2) + " ms");
+			}
+		}
+	}).run();
+
 
 });
