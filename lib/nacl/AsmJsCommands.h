@@ -135,24 +135,24 @@ enum FJS_AxisReductionType {
 extern "C" {
 #endif
 
-enum FJS_Error FJS_Execute_CreateEmptyArray(PP_Instance instance, uint32_t idOut, struct FJS_Shape shape, enum FJS_DataType dataType);
-enum FJS_Error FJS_Execute_CreateConstArray(PP_Instance instance, uint32_t idOut, struct FJS_Shape shape, enum FJS_DataType dataType, double fillValue);
-enum FJS_Error FJS_Execute_CreateDataArray(PP_Instance instance, uint32_t idOut, struct FJS_Shape shape, enum FJS_DataType dataType, struct FJS_Buffer dataBuffer);
-enum FJS_Error FJS_Execute_CreateIdentityMatrix(PP_Instance instance, uint32_t id_out, uint32_t rows, uint32_t columns, int32_t diagonal, enum FJS_DataType dataType);
-enum FJS_Error FJS_Execute_LinSpace(PP_Instance instance, uint32_t idOut, double start, double stop, uint32_t samples, bool closed, enum FJS_DataType dataType);
-enum FJS_Error FJS_Execute_ReShape(PP_Instance instance, int32_t idA, uint32_t idOut, struct FJS_Shape shapeOut);
-enum FJS_Error FJS_Execute_Repeat(PP_Instance instance, int32_t idA, uint32_t idOut, uint32_t repeats, uint32_t axis);
-enum FJS_Error FJS_Execute_DeAllocate(PP_Instance instance, int32_t idA);
-enum FJS_Error FJS_Execute_Fetch(PP_Instance instance, int32_t idA, struct FJS_Buffer* buffer);
-enum FJS_Error FJS_Execute_Info(PP_Instance instance, struct PP_Var* response);
-enum FJS_Error FJS_Execute_BinaryOperation(PP_Instance instance, enum FJS_BinaryOperationType type, int32_t idA, int32_t idB, uint32_t idOut);
-enum FJS_Error FJS_Execute_BinaryConstOperation(PP_Instance instance, enum FJS_BinaryConstOperationType type, int32_t idA, double valueB, uint32_t idOut);
-enum FJS_Error FJS_Execute_UnaryOperation(PP_Instance instance, enum FJS_UnaryOperationType type, int32_t idA, uint32_t idOut);
-enum FJS_Error FJS_Execute_Reduction(PP_Instance instance, enum FJS_ReductionType type, int32_t idA, uint32_t idOut);
-enum FJS_Error FJS_Execute_AxisReduction(PP_Instance instance, enum FJS_AxisReductionType type, int32_t idA, uint32_t axis, uint32_t idOut);
-enum FJS_Error FJS_Execute_DotOperation(PP_Instance instance, int32_t idA, int32_t idB, uint32_t idOut);
-enum FJS_Error FJS_Execute_CholeskyDecomposition(PP_Instance instance, int32_t idA, bool isLower, uint32_t idOut);
-enum FJS_Error FJS_Execute_SolveTriangular(PP_Instance instance, int32_t idA, int32_t idY, uint32_t idX, bool isLower, bool transpose, bool unitDiagonal);
+int FJS_Execute_CreateEmptyArray(uint32_t idOut, struct FJS_Shape shape, enum FJS_DataType dataType);
+int FJS_Execute_CreateConstArray(uint32_t idOut, struct FJS_Shape shape, enum FJS_DataType dataType, double fillValue);
+int FJS_Execute_CreateDataArray(uint32_t idOut, struct FJS_Shape shape, enum FJS_DataType dataType, struct FJS_Buffer dataBuffer);
+int FJS_Execute_CreateIdentityMatrix(uint32_t id_out, uint32_t rows, uint32_t columns, int32_t diagonal, enum FJS_DataType dataType);
+int FJS_Execute_LinSpace(uint32_t idOut, double start, double stop, uint32_t samples, bool closed, enum FJS_DataType dataType);
+int FJS_Execute_ReShape(int32_t idA, uint32_t idOut, struct FJS_Shape shapeOut);
+int FJS_Execute_Repeat(int32_t idA, uint32_t idOut, uint32_t repeats, uint32_t axis);
+int FJS_Execute_DeAllocate(int32_t idA);
+int FJS_Execute_Fetch(int32_t idA, struct FJS_Buffer* buffer);
+int FJS_Execute_Info(struct PP_Var* response);
+int FJS_Execute_BinaryOperation(enum FJS_BinaryOperationType type, int32_t idA, int32_t idB, uint32_t idOut);
+int FJS_Execute_BinaryConstOperation(enum FJS_BinaryConstOperationType type, int32_t idA, double valueB, uint32_t idOut);
+int FJS_Execute_UnaryOperation(enum FJS_UnaryOperationType type, int32_t idA, uint32_t idOut);
+int FJS_Execute_Reduction(enum FJS_ReductionType type, int32_t idA, uint32_t idOut);
+int FJS_Execute_AxisReduction(enum FJS_AxisReductionType type, int32_t idA, uint32_t axis, uint32_t idOut);
+int FJS_Execute_DotOperation(int32_t idA, int32_t idB, uint32_t idOut);
+int FJS_Execute_CholeskyDecomposition(int32_t idA, bool isLower, uint32_t idOut);
+int FJS_Execute_SolveTriangular(int32_t idA, int32_t idY, uint32_t idX, bool isLower, bool transpose, bool unitDiagonal);
 
 #ifdef __cplusplus
 } // extern "C"

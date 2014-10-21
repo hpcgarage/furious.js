@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 
-#include "Interfaces.h"
+//#include "Interfaces.h"
 #include "DataType.h"
 
 struct NDArray {
