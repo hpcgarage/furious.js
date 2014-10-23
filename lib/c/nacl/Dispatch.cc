@@ -5,12 +5,13 @@
 
 #include <unistd.h>
 
-#include "Error.h"
-#include "Commands.h"
-#include "Interfaces.h"
+#include <common/Error.h>
+#include <common/Commands.h>
 
-#include "Requests.pb.h"
-#include "Responses.pb.h"
+#include <nacl/Interfaces.h>
+
+#include <nacl/Requests.pb.h>
+#include <nacl/Responses.pb.h>
 
 extern "C" enum FJS_Error FJS_Dispatch_Init(PP_Instance instance) {
 	furious::Response response;

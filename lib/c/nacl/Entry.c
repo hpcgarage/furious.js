@@ -9,12 +9,13 @@
 #include <ppapi/c/ppp_messaging.h>
 #include <ppapi/c/ppp_instance.h>
 
-#include "Error.h"
-#include "DataType.h"
-#include "Interfaces.h"
-#include "Commands.h"
-#include "Strings.h"
-#include "Util.h"
+#include <common/Error.h>
+#include <common/DataType.h>
+#include <common/Commands.h>
+#include <common/Util.h>
+
+#include <nacl/Interfaces.h>
+#include <nacl/Strings.h>
 
 const struct PPB_Console_1_0* consoleInterface = NULL;
 const struct PPB_Var_1_1* varInterface = NULL;

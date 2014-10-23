@@ -4,14 +4,18 @@
 #include <math.h>
 #include <sys/types.h>
 
-#include "Error.h"
-#include "DataType.h"
-#include "NDArray.h"
-#include "Commands.h"
-#include "Interfaces.h"
-#include "Strings.h"
-#include "IdMap.h"
-#include "Util.h"
+#include <common/Error.h>
+#include <common/DataType.h>
+#include <common/NDArray.h>
+#include <common/Commands.h>
+#include <common/IdMap.h>
+#include <common/Util.h>
+
+#ifdef __native_client__
+#include <nacl/Interfaces.h>
+#include <nacl/Strings.h>
+#endif
+
 
 typedef void (*BinaryOpFunction)(size_t, const void*, const void*, void*);
 static void addF32(size_t length, const float dataA[static length], const float dataB[static length], float dataOut[static length]);
@@ -205,7 +209,10 @@ static const SolveTriangularFunction solveTriangularFunctions[] = {
 	[FJS_DataType_F32] = (SolveTriangularFunction) solveTriangularF32
 };
 
-enum FJS_Error FJS_Execute_BinaryOperation(PP_Instance instance,
+enum FJS_Error FJS_Execute_BinaryOperation(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	enum FJS_BinaryOperationType type,
 	int32_t idA,
 	int32_t idB,
@@ -339,7 +346,10 @@ enum FJS_Error FJS_Execute_BinaryOperation(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_BinaryConstOperation(PP_Instance instance,
+enum FJS_Error FJS_Execute_BinaryConstOperation(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	enum FJS_BinaryConstOperationType type,
 	int32_t idA,
 	double valueB,
@@ -431,7 +441,10 @@ enum FJS_Error FJS_Execute_BinaryConstOperation(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_UnaryOperation(PP_Instance instance,
+enum FJS_Error FJS_Execute_UnaryOperation(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	enum FJS_UnaryOperationType type,
 	int32_t idA,
 	uint32_t idOut)
@@ -517,7 +530,10 @@ enum FJS_Error FJS_Execute_UnaryOperation(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_Reduction(PP_Instance instance,
+enum FJS_Error FJS_Execute_Reduction(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	enum FJS_ReductionType type,
 	int32_t idA,
 	uint32_t idOut)
@@ -592,7 +608,10 @@ enum FJS_Error FJS_Execute_Reduction(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_AxisReduction(PP_Instance instance,
+enum FJS_Error FJS_Execute_AxisReduction(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	enum FJS_AxisReductionType type,
 	int32_t idA,
 	uint32_t axis,
@@ -695,7 +714,10 @@ enum FJS_Error FJS_Execute_AxisReduction(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_DotOperation(PP_Instance instance,
+enum FJS_Error FJS_Execute_DotOperation(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	int32_t idA,
 	int32_t idB,
 	uint32_t idOut)
@@ -822,7 +844,10 @@ enum FJS_Error FJS_Execute_DotOperation(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_CholeskyDecomposition(PP_Instance instance,
+enum FJS_Error FJS_Execute_CholeskyDecomposition(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	int32_t idA,
 	bool isLower,
 	uint32_t idOut)
@@ -921,7 +946,10 @@ enum FJS_Error FJS_Execute_CholeskyDecomposition(PP_Instance instance,
 	return FJS_Error_Ok;
 }
 
-enum FJS_Error FJS_Execute_SolveTriangular(PP_Instance instance,
+enum FJS_Error FJS_Execute_SolveTriangular(
+#ifdef __native_client__
+	PP_Instance instance,
+#endif
 	int32_t idA,
 	int32_t idY,
 	uint32_t idX,

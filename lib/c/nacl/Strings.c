@@ -1,8 +1,9 @@
 #include <stddef.h>
 
-#include "Strings.h"
-//#include "Interfaces.h"
-#include "Util.h"
+#include <common/Util.h>
+
+#include <nacl/Strings.h>
+#include <nacl/Interfaces.h>
 
 struct PP_Var FJS_StringVariables[FJS_StringVariable_NumberOfEntries];
 

@@ -2,8 +2,11 @@
 
 #include <stdint.h>
 
-//#include "Interfaces.h"
-#include "DataType.h"
+#include <common/DataType.h>
+
+#ifdef __native_Client
+#include <nacl/Interfaces.h>
+#endif
 
 struct NDArray {
 	enum FJS_DataType dataType;

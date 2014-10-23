@@ -1,7 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
-//#include <ppapi/c/pp_var.h>
+#include <ppapi/c/pp_var.h>
 
 enum FJS_StringVariable {
 	FJS_StringVariable_IDAllocations,

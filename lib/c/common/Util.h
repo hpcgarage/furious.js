@@ -7,7 +7,7 @@
 #define FJS_LENGTH_OF(stringLiteral) (FJS_COUNT_OF(stringLiteral) - 1)
 
 inline static bool FJS_Util_Mul32u(uint32_t a, uint32_t b, uint32_t out[restrict static 1]) {
-#if defined(__clang__) && !defined(__pnacl__)
+#if defined(__clang__) && !defined(__pnacl__) && !defined(EMSCRIPTEN)
 	return !__builtin_umul_overflow(a, b, out);
 #else
 	const uint64_t fullProduct = ((uint64_t)a) * ((uint64_t)b);
@@ -17,7 +17,7 @@ inline static bool FJS_Util_Mul32u(uint32_t a, uint32_t b, uint32_t out[restrict
 }
 
 inline static bool FJS_Util_Add32u(uint32_t a, uint32_t b, uint32_t out[restrict static 1]) {
-#if defined(__clang__) && !defined(__pnacl__)
+#if defined(__clang__) && !defined(__pnacl__) && !defined(EMSCRIPTEN)
 	return !__builtin_uadd_overflow(a, b, out);
 #else
 	const uint32_t sum = a + b;
