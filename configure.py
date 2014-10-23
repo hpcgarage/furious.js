@@ -14,7 +14,6 @@ if __name__ == '__main__':
     parser = optparse.OptionParser()
     parser.add_option("--disable-emscripten", action="store_false", dest="build_emscripten", default=True)
     parser.add_option("--with-emcc", dest="emcc", default="emcc")
-    parser.add_option("--with-em++", dest="emcxx", default="em++")
     parser.add_option("--disable-pnacl", action="store_false", dest="build_pnacl", default=True)
     parser.add_option("--with-protoc", dest="protoc", default="protoc")
     parser.add_option("--with-nacl-sdk", dest="nacl_sdk", default=os.getenv("NACL_SDK_ROOT"))
@@ -52,7 +51,6 @@ if __name__ == '__main__':
             print("Unsupported platform: " + sys.platform, file=sys.stderr)
             exit(1)
         ninja.variable('emcc', options.emcc)
-        ninja.variable('emcxx', options.emcxx)
         ninja.variable('protoc', options.protoc)
 
         # Rules
