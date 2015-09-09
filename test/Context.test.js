@@ -401,7 +401,7 @@ describe("Context", function(){
 
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Creates an output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Creates an output array with exponential of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.exp(x);
 						y.get(function(y) {
@@ -417,7 +417,7 @@ describe("Context", function(){
 		describe("With an output array", function() {
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Populates the output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Populates the output array with exponential of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.ones(x.shape, x.dataType);
 						context.exp(x, y);
@@ -457,7 +457,7 @@ describe("Context", function(){
 
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Creates an output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Creates an output array with log of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.log(x);
 						y.get(function(y) {
@@ -473,7 +473,7 @@ describe("Context", function(){
 		describe("With an output array", function() {
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Populates the output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Populates the output array with log of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.ones(x.shape, x.dataType);
 						context.log(x, y);
@@ -513,7 +513,7 @@ describe("Context", function(){
 
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Creates an output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Creates an output array with square root of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.sqrt(x);
 						y.get(function(y) {
@@ -529,7 +529,7 @@ describe("Context", function(){
 		describe("With an output array", function() {
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Populates the output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Populates the output array with square root of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.ones(x.shape, x.dataType);
 						context.sqrt(x, y);
@@ -569,7 +569,7 @@ describe("Context", function(){
 
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Creates an output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Creates an output array with square of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.square(x);
 						y.get(function(y) {
@@ -585,7 +585,7 @@ describe("Context", function(){
 		describe("With an output array", function() {
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Populates the output array with absolute values of elements (" + dataType + " data type)", function(done) {
+					it("Populates the output array with square of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.ones(x.shape, x.dataType);
 						context.square(x, y);
