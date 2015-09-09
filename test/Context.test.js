@@ -432,6 +432,118 @@ describe("Context", function(){
 			}
 		});
 	});
+	describe("expm1", function() {
+		var xRef = [1, -1, 0];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.expm1(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.expm1(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with exponential - 1 of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.expm1(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.expm1(xRef[k]), Math.abs(Math.expm1(xRef[k]) * 3 * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with exponential - 1 of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.expm1(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.expm1(xRef[k]), Math.abs(Math.expm1(xRef[k]) * 3 * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("exp2", function() {
+		var xRef = [1, -1, 0];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.exp2(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.exp2(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with exponential (base 2) of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.exp2(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.pow(2, xRef[k]), Math.pow(2, xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with exponential (base 2) of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.exp2(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.pow(2, xRef[k]), Math.pow(2, xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
 	describe("log", function() {
 		var xRef = [1, 3, 10];
 		var dataTypes = ["f32", "f64"];
@@ -451,13 +563,10 @@ describe("Context", function(){
 						var y = context.log(x);
 						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
 						y.invalidate();
-					});
-				})(dataTypes[i]);
-			}
-
+					}); })(dataTypes[i]); } 
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Creates an output array with log of elements (" + dataType + " data type)", function(done) {
+					it("Creates an output array with natural log of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.log(x);
 						y.get(function(y) {
@@ -473,13 +582,181 @@ describe("Context", function(){
 		describe("With an output array", function() {
 			for (var i = 0; i < dataTypes.length; i++) {
 				(function(dataType) {
-					it("Populates the output array with log of elements (" + dataType + " data type)", function(done) {
+					it("Populates the output array with natural log of elements (" + dataType + " data type)", function(done) {
 						var x = context.array(xRef, new furious.DataType(dataType));
 						var y = context.ones(x.shape, x.dataType);
 						context.log(x, y);
 						y.get(function(y) {
 							for (var k = 0; k < y.length; k++) {
 								expect(y[k]).to.be.closeTo(Math.log(xRef[k]), Math.log(xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("log10", function() {
+		var xRef = [1, 3, 10];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.log10(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.log10(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with log (base 10) of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.log10(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.log10(xRef[k]), Math.log10(xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with log (base 10) of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.log10(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.log10(xRef[k]), Math.log10(xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("log2", function() {
+		var xRef = [1, 3, 10];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.log2(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.log2(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with log (base 2) of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.log2(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.log2(xRef[k]), Math.log2(xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with log (base 2) of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.log2(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.log2(xRef[k]), Math.log2(xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("log1p", function() {
+		var xRef = [1, 3, 10];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.log1p(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.log1p(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with logp1 of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.log1p(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.log1p(xRef[k]), Math.log1p(xRef[k]) * 3 * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with logp1 of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.log1p(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.log1p(xRef[k]), Math.log1p(xRef[k]) * 3 * x.dataType.epsilon);
 							}
 							done();
 						});
@@ -592,6 +869,728 @@ describe("Context", function(){
 						y.get(function(y) {
 							for (var k = 0; k < y.length; k++) {
 								expect(y[k]).to.be.closeTo(xRef[k] * xRef[k], xRef[k] * xRef[k] * x.dataType.epsilon);
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("sin", function() {
+		var xRef = [-3, -1, 0, 0.5, 9];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.sin(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.sin(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with sin of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.sin(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.sin(xRef[k]), Math.abs(Math.sin(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with sin of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.sin(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.sin(xRef[k]), Math.abs(Math.sin(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("cos", function() {
+		var xRef = [-3, -1, 0, 0.5, 9];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.cos(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.cos(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with cos of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.cos(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.cos(xRef[k]), Math.abs(Math.cos(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with cos of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.cos(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.cos(xRef[k]), Math.abs(Math.cos(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("tan", function() {
+		var xRef = [-3, -1, 0, 0.5, 9];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.tan(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.tan(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with tan of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.tan(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.tan(xRef[k]), Math.abs(Math.tan(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with tan of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.tan(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.tan(xRef[k]), Math.abs(Math.tan(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("arcsin", function() {
+		var xRef = [-1, -0.3, 0, 0.5, 1];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.arcsin(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.arcsin(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with arcsin of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.arcsin(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.asin(xRef[k]), Math.abs(Math.asin(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with arcsin of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.arcsin(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.asin(xRef[k]), Math.abs(Math.asin(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("arccos", function() {
+		var xRef = [-1, -0.3, 0, 0.5, 1];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.arccos(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.arccos(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with arccos of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.arccos(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.acos(xRef[k]), Math.abs(Math.acos(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with arccos of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.arccos(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.acos(xRef[k]), Math.abs(Math.acos(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("arctan", function() {
+		var xRef = [-1, -0.3, 0, 0.5, 1];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.arctan(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.arctan(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with arctan of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.arctan(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.atan(xRef[k]), Math.abs(Math.atan(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with arctan of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.arctan(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.atan(xRef[k]), Math.abs(Math.atan(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("degrees", function() {
+		var xRef = [-3, 0.1, 8];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.degrees(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.degrees(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with elements converted from radians to degrees (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.degrees(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(xRef[k] * (180.0 / Math.PI), Math.abs(xRef[k] * (180.0 / Math.PI) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with elements converted from radians to degrees (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.degrees(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(xRef[k] * (180.0 / Math.PI), Math.abs(xRef[k] * (180.0 / Math.PI) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("radians", function() {
+		var xRef = [-3, 0.1, 8];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.radians(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.radians(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with elements converted from degrees to radians (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.radians(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(xRef[k] * (Math.PI / 180.0), Math.abs(xRef[k] * (Math.PI / 180.0) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with elements converted from degrees to radians (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.radians(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(xRef[k] * (Math.PI / 180.0), Math.abs(xRef[k] * (Math.PI / 180.0) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("rint", function() {
+		var xRef = [-0.51, -0.3, 3.5];
+		var yRef = [-1.0, -0.0, 4];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.rint(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.rint(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with rint of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.rint(x);
+						y.get(function(y) {
+							expect(y).to.deep.equal(yRef);
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with rint of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.rint(x, y);
+						y.get(function(y) {
+							expect(y).to.deep.equal(yRef);
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("fix", function() {
+		var xRef = [-0.51, -0.3, 3.577];
+		var yRef = [-0.0, -0.0, 3.0];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.fix(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.fix(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with truncated elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.fix(x);
+						y.get(function(y) {
+							expect(y).to.deep.equal(yRef);
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with truncated elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.fix(x, y);
+						y.get(function(y) {
+							expect(y).to.deep.equal(yRef);
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("floor", function() {
+		var xRef = [-3, -1, 0, 0.5, 9];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.floor(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.floor(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with floor of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.floor(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.floor(xRef[k]), Math.abs(Math.floor(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with floor of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.floor(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.floor(xRef[k]), Math.abs(Math.floor(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("ceil", function() {
+		var xRef = [-3, -1, 0, 0.5, 9];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.ceil(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ceil(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with ceil of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ceil(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.ceil(xRef[k]), Math.abs(Math.ceil(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with ceil of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.ceil(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.ceil(xRef[k]), Math.abs(Math.ceil(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+	});
+	describe("trunc", function() {
+		var xRef = [-3, -1, 0, 0.5, 9];
+		var dataTypes = ["f32", "f64"];
+
+		describe("With no output array supplied", function() {
+			it("Creates an output array with the same shape as input array", function() {
+				var x = context.ones([2, 3, 4]);
+				var y = context.trunc(x);
+				expect(y.shape).to.deep.equal([2, 3, 4]);
+				y.invalidate();
+			});
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with the same data type as input array (" + dataType + " data type)", function() {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.trunc(x);
+						expect(y.dataType.equals(new furious.DataType(dataType))).to.be.true;
+						y.invalidate();
+					});
+				})(dataTypes[i]);
+			}
+
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Creates an output array with trunc of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.trunc(x);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.trunc(xRef[k]), Math.abs(Math.trunc(xRef[k]) * x.dataType.epsilon));
+							}
+							done();
+						});
+					});
+				})(dataTypes[i]);
+			}
+		});
+		describe("With an output array", function() {
+			for (var i = 0; i < dataTypes.length; i++) {
+				(function(dataType) {
+					it("Populates the output array with trunc of elements (" + dataType + " data type)", function(done) {
+						var x = context.array(xRef, new furious.DataType(dataType));
+						var y = context.ones(x.shape, x.dataType);
+						context.trunc(x, y);
+						y.get(function(y) {
+							for (var k = 0; k < y.length; k++) {
+								expect(y[k]).to.be.closeTo(Math.trunc(xRef[k]), Math.abs(Math.trunc(xRef[k]) * x.dataType.epsilon));
 							}
 							done();
 						});
