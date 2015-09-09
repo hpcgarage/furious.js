@@ -264,6 +264,10 @@ static const UnaryOpFunction unaryOpFunctions[][FJS_DataType_Max] = {
 		[FJS_DataType_F64] = (UnaryOpFunction) rintF64,
 		[FJS_DataType_F32] = (UnaryOpFunction) rintF32
 	},
+	[FJS_UnaryOperationType_Fix] = {
+		[FJS_DataType_F64] = (UnaryOpFunction) truncF64,
+		[FJS_DataType_F32] = (UnaryOpFunction) truncF32
+	},
 	[FJS_UnaryOperationType_Floor] = {
 		[FJS_DataType_F64] = (UnaryOpFunction) floorF64,
 		[FJS_DataType_F32] = (UnaryOpFunction) floorF32
