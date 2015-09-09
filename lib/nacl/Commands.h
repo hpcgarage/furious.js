@@ -167,9 +167,10 @@ enum FJS_UnaryOperationType {
 	FJS_UnaryOperationType_Degrees= 17,
 	FJS_UnaryOperationType_Radians= 18,
 	FJS_UnaryOperationType_Rint   = 19,
-	FJS_UnaryOperationType_Floor  = 20,
-	FJS_UnaryOperationType_Ceil   = 21,
-	FJS_UnaryOperationType_Trunc  = 22
+	FJS_UnaryOperationType_Fix    = 20, // TODO: implement
+	FJS_UnaryOperationType_Floor  = 21,
+	FJS_UnaryOperationType_Ceil   = 22,
+	FJS_UnaryOperationType_Trunc  = 23
 };
 
 enum FJS_ReductionType {
