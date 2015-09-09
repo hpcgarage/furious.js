@@ -1700,7 +1700,7 @@ static void expm1F64(size_t length, const double dataA[static length], double da
 	} else {
 		/* Non-destructive operation: out[i] = exp(a[i]) */
 		while (length--) {
-			*dataOut++ = expm1(*dataA++) - 1;
+			*dataOut++ = expm1(*dataA++);
 		}
 	}
 }
