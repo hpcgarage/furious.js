@@ -38,7 +38,7 @@ module.exports = function(grunt) {
 					"furious.js": ["lib/furious.js"]
 				}
 			},
-			worker: {
+			jsworker: {
 				options: {
 					transform: ["brfs"],
 					browserifyOptions : {
@@ -46,7 +46,18 @@ module.exports = function(grunt) {
 					}
 				},
 				files: {
-					"furious-worker.js": ["lib/js/AsmJSWorker.js"]
+					"furious-worker.js": ["lib/js/JSWorker.js"]
+				}
+			},
+			asmjsworker: {
+				options: {
+					transform: ["brfs"],
+					browserifyOptions : {
+						debug: false
+					}
+				},
+				files: {
+					"furious-asmjs-worker.js": ["lib/js/AsmJSWorker.js"]
 				}
 			},
 			test: {
@@ -84,6 +95,11 @@ module.exports = function(grunt) {
 			worker: {
 				files: {
 					"furious-worker.min.js": ["furious-worker.js"]
+				}
+			},
+			asmjsworker: {
+				files: {
+					"furious-asmjs-worker.min.js": ["furious-asmjs-worker.js"]
 				}
 			}
 		},
