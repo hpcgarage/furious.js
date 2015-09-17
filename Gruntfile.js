@@ -46,7 +46,7 @@ module.exports = function(grunt) {
 					}
 				},
 				files: {
-					"furious-worker.js": ["lib/js/JSWorker.js"]
+					"furious-worker.js": ["lib/js/AsmJSWorker.js"]
 				}
 			},
 			test: {
