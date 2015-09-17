@@ -1,0 +1,24 @@
+{
+  "name": "furiousBench",
+  "version": "0.0.1",
+  "description": "Yuhui's week 1 assignment. A benchmark for creating empty array",
+  "main": "Gruntfile.js",
+  "scripts": {
+    "preinstall": "npm install -g grunt-cli"
+  },
+  "dependencies": {
+    "angular": "^1.3.0",
+    "angular-chart.js": "^0.8.3",
+    "angular-route": "^1.3.0",
+    "angular-material": "^0.11.0",
+    "protobufjs": "^3.6.0"
+  },
+  "devDependencies": {
+    "benchmark": "^1.0.0",
+    "grunt": "^0.4.5",
+    "grunt-browserify": "^4.0.0",
+    "grunt-contrib-copy": "^0.8.1"
+  },
+  "author": "Yuhui",
+  "license": "MIT"
+}

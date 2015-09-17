@@ -1,0 +1,25 @@
+<div>
+  <div>
+    <h1>Supported backend</h1>
+    <p ng-repeat="backEnd in backEndOptions track by $index">{{($index+1) +". " + backEnd}}</p>
+  </div>
+  <div>
+    <h1>test creating 1 empty arrays  of size 1*N</h1>
+    <button ng-click=runTest1()>Start Test</button>
+    <p>{{res}}</p>
+    <canvas id="bar" class="chart chart-bar" chart-data="res1" chart-labels="labels"  chart-legend="true" chart-series="series">
+  </canvas>
+  </div>
+  <div>
+    <h1>test creating N empty arrays  of size 1*{{SIZE}}</h1>
+    <button ng-click=runTest2()>Start Test</button>
+    <code>{{res2}}</code>
+    <canvas id="bar" class="chart chart-bar" chart-data="res2" chart-labels="TEST_NUMS"  chart-legend="true" chart-series="series">
+  </canvas>
+  </div>
+  <div>
+    <h1>test matrix addition</h1>
+    <button ng-click=runTest3()>Start Test</button>
+    <code>{{res3}}</code>
+  </div>
+</div>
