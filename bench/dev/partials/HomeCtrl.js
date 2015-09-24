@@ -63,25 +63,27 @@ angular.module('furiousBM.controllers')
     }
 
     $scope.res2 = [];
-    $scope.SIZE = 2;
+    $scope.SIZE = 10;
     var TEST_NUMS = [1,10,100,500, 1000, 2000];
     $scope.TEST_NUMS = TEST_NUMS;
-    var run2 = function(context, num, backEnd, j) {
+    var run2 = function(context, num, backEnd) {
         var TEST_NUMS = $scope.TEST_NUMS;
         var ndx = $scope.series.indexOf(backEnd);
         var SIZE = $scope.SIZE;
         var onComp = function(event) {
             var time = (this.stats.mean * 1000).toFixed(5)
             var message = this.name + ": " + time + " ms";
-            $scope.res2[ndx][TEST_NUMS.indexOf(num)] += parseFloat(time);
+            $scope.res2[ndx][TEST_NUMS.indexOf(num)] = time;
             console.log(message);
             $scope.$apply();
         }
-        Benchmark(("Create " + j + "/" +num + "empty array of size 1*" + SIZE), {
+        Benchmark(("Create " +num + " empty array of size 1*" + SIZE), {
             "defer" : true,
 
             "fn":function(deferred) {
-                var x = context.empty([1,SIZE]);
+                for (var i = 0; i < num; i++) {
+                    var x = context.empty([1,SIZE]);
+                }
                 context.barrier(function() {
                     deferred.resolve();
                     $scope.$apply();
@@ -96,9 +98,7 @@ angular.module('furiousBM.controllers')
             for (var i = 0, limit = TEST_NUMS.length; i < limit; i++) {
                 console.log("testing: " + backEnd);
                 var num = TEST_NUMS[i]
-                for (var j = num; j > 0; j--) {
-                    run2(context, num, backEnd, j);
-                }
+                run2(context, num, backEnd)
             }
         })
     }
@@ -116,6 +116,7 @@ angular.module('furiousBM.controllers')
     }
 
     $scope.res3 = [];
+    $scope.TIMES = [10, 50, 100, 200, 500]
     $scope.arrGen = function arrGen(size, m, n) {
         var res = [];
         for(var k = 0; k<size; k++) {
@@ -130,39 +131,44 @@ angular.module('furiousBM.controllers')
         }
         return res;
     }
-    var run3 = function run3(context, backEnd) {
-        var arrs = $scope.arrGen(20, 100, 100);
+    var run3 = function run3(times, context, backEnd) {
+        var arrs = $scope.arrGen(1, 100, 100);
+        var x = (context.array(arrs[0])).retain();
         var onComp = function onComp() {
             var time = (this.stats.mean * 1000).toFixed(5)
             var message = this.name + ": " + time + " ms";
-            $scope.res3.push(time);
+            $scope.res3[$scope.backEndOptions.indexOf(backEnd)][$scope.TIMES.indexOf(times)] = time;
             console.log(message);
             $scope.$apply();
         }
-        Benchmark(("20 size[100, 100] f64 matrix addition using " + backEnd), {
+        var benchFunc = function benchFunc(deferred) {
+            for (var i = 1; i < times; i++) {
+                x = x.add(x);
+            }
+            context.barrier(function() {
+                deferred.resolve();
+                $scope.$apply();
+            })
+        }
+        Benchmark((times + " size[100, 100] f64 matrix addition using " + backEnd), {
             "defer" : true,
-            "fn": function(deferred) {
-                var x = (context.array(arrs[0])).retain();
-                for (var i = 1; i < 20; i++) {
-                    var x = x.add(context.array(arrs[i]));
-                }
-                context.barrier(function() {
-                    deferred.resolve();
-                    $scope.$apply();
-                })
-            },
+            "fn": benchFunc,
             "onComplete" : onComp
         }).run()
     }
     var testHelper3 = function testHelper3(backEnd) {
         furious.init(backEnd, function(context) {
             console.log("testing: " + backEnd);
-            run3(context, backEnd);
+            for(var i =0, limit = $scope.TIMES.length; i < limit; i++) {
+                run3($scope.TIMES[i], context, backEnd);
+            }
         })
     }
     $scope.runTest3 = function runTest3() {
         for (var i = 0, limit = $scope.backEndOptions.length; i < limit; i++) {
             var backEnd = $scope.backEndOptions[i];
+            $scope.res3[i] = $scope.TIMES.map(function(){return 0});
+            $scope.series[i] = backEnd;
             try{
                 testHelper3(backEnd);
             }catch(e){

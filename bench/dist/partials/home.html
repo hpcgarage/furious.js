@@ -5,21 +5,27 @@
   </div>
   <div>
     <h1>test creating 1 empty arrays  of size 1*N</h1>
-    <button ng-click=runTest1()>Start Test</button>
-    <p>{{res}}</p>
-    <canvas id="bar" class="chart chart-bar" chart-data="res1" chart-labels="labels"  chart-legend="true" chart-series="series">
-  </canvas>
+    <button ng-click=runTest1()>Start Test</button><br/>
+    <p>{{res1}}</p>
+      <div class = "benchChart">
+        <canvas id="bar" class="chart chart-bar" chart-data="res1" chart-labels="labels"  chart-legend="true" chart-series="series"></canvas>
+      </div>
+
   </div>
   <div>
     <h1>test creating N empty arrays  of size 1*{{SIZE}}</h1>
-    <button ng-click=runTest2()>Start Test</button>
+    <button ng-click=runTest2()>Start Test</button><br/>
     <code>{{res2}}</code>
-    <canvas id="bar" class="chart chart-bar" chart-data="res2" chart-labels="TEST_NUMS"  chart-legend="true" chart-series="series">
-  </canvas>
+    <div class = "benchChart">
+      <canvas id="bar" class="chart chart-bar" chart-data="res2" chart-labels="TEST_NUMS"  chart-legend="true" chart-series="series"></canvas>
+    </div>
   </div>
   <div>
-    <h1>test matrix addition</h1>
-    <button ng-click=runTest3()>Start Test</button>
+    <h1>test matrix adding n matrix of size 100*100</h1>
+    <button ng-click=runTest3()>Start Test</button><br/>
     <code>{{res3}}</code>
+    <div class = "benchChart">
+      <canvas id="bar" class="chart chart-bar" chart-data="res3" chart-labels="TIMES"  chart-legend="true" chart-series="series">
+    </div>
   </div>
 </div>
