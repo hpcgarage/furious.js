@@ -1297,22 +1297,38 @@ static void subF64(size_t length, const double dataA[static length], const doubl
 }
 
 static void mulF32(size_t length, const float dataA[static length], const float dataB[static length], float dataOut[static length]) {
+	int i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] * b[i] */
-		while (length--) {
-			*dataOut = (*dataOut) * (*dataB++);
-			dataOut++;
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) * *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataOut + i) * *(dataB + i);
+			i++;
 		}
 	} else if (dataOut == dataB) {
 		/* In-place operation: out[i] = a[i] * out[i] */
-		while (length--) {
-			*dataOut = (*dataA++) * (*dataOut);
-			dataOut++;
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * *((v4sf*) (dataOut + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) * *(dataOut + i);
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] * b[i] */
-		while (length--) {
-			*dataOut++ = (*dataA++) * (*dataB++);
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) * *(dataB + i);
+			i++;
 		}
 	}
 }
@@ -1339,22 +1355,38 @@ static void mulF64(size_t length, const double dataA[static length], const doubl
 }
 
 static void divF32(size_t length, const float dataA[static length], const float dataB[static length], float dataOut[static length]) {
+	int i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
-		/* In-place operation: out[i] = out[i] / b[i] */
-		while (length--) {
-			*dataOut = (*dataOut) * (*dataB++);
-			dataOut++;
+		/* In-place operation: out[i] = out[i] * b[i] */
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) / *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataOut + i) / *(dataB + i);
+			i++;
 		}
 	} else if (dataOut == dataB) {
-		/* In-place operation: out[i] = a[i] / out[i] */
-		while (length--) {
-			*dataOut = (*dataA++) * (*dataOut);
-			dataOut++;
+		/* In-place operation: out[i] = a[i] * out[i] */
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) / *((v4sf*) (dataOut + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) / *(dataOut + i);
+			i++;
 		}
 	} else {
-		/* Non-destructive operation: out[i] = a[i] / b[i] */
-		while (length--) {
-			*dataOut++ = (*dataA++) * (*dataB++);
+		/* Non-destructive operation: out[i] = a[i] * b[i] */
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) / *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) / *(dataB + i);
+			i++;
 		}
 	}
 }
