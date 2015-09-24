@@ -133,7 +133,7 @@ angular.module('furiousBM.controllers')
     }
     var run3 = function run3(times, context, backEnd) {
         var arrs = $scope.arrGen(1, 100, 100);
-        var x = (context.array(arrs[0])).retain();
+        var x = (context.array(arrs[0],new furious.DataType("f32"))).retain();
         var onComp = function onComp() {
             var time = (this.stats.mean * 1000).toFixed(5)
             var message = this.name + ": " + time + " ms";
