@@ -129,6 +129,8 @@ static void solveTriangularF64(size_t rows, size_t columns,
 	double dataB[restrict static rows*columns],
 	bool transpose, bool isLower, bool unitDiagonal);
 
+typedef float v4sf __attribute__((__vector_size__(16)));
+
 static const BinaryOpFunction binaryOpFunctions[][FJS_DataType_Max] = {
 	[FJS_BinaryOperationType_Add] = {
 		[FJS_DataType_F64] = (BinaryOpFunction) addF64,
@@ -904,7 +906,7 @@ enum FJS_Error FJS_Execute_DotOperation(PP_Instance instance,
 			}
 			shapeOut[axisA + axisB] = shapeB[dimensionsB - 1];
 		}
-		
+
 		/* Create output array */
 		arrayOut = FJS_NDArray_Create(dimensionsOut, lengthOut, shapeOut, dataTypeOut);
 		if (arrayOut == NULL) {
@@ -1179,22 +1181,38 @@ enum FJS_Error FJS_Execute_SolveTriangular(PP_Instance instance,
 /* Binary element-wise operations */
 
 static void addF32(size_t length, const float dataA[static length], const float dataB[static length], float dataOut[static length]) {
+	int i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] + b[i] */
-		while (length--) {
-			*dataOut = (*dataOut) + (*dataB++);
-			dataOut++;
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) + *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataOut + i) + *(dataB + i);
+			i++;
 		}
 	} else if (dataOut == dataB) {
 		/* In-place operation: out[i] = a[i] + out[i] */
-		while (length--) {
-			*dataOut = (*dataA++) + (*dataOut);
-			dataOut++;
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) + *((v4sf*) (dataOut + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) + *(dataOut + i);
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] + b[i] */
-		while (length--) {
-			*dataOut++ = (*dataA++) + (*dataB++);
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) + *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) + *(dataB + i);
+			i++;
 		}
 	}
 }
@@ -1221,22 +1239,38 @@ static void addF64(size_t length, const double dataA[static length], const doubl
 }
 
 static void subF32(size_t length, const float dataA[static length], const float dataB[static length], float dataOut[static length]) {
+	int i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] - b[i] */
-		while (length--) {
-			*dataOut = (*dataOut) - (*dataB++);
-			dataOut++;
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) - *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataOut + i) - *(dataB + i);
+			i++;
 		}
 	} else if (dataOut == dataB) {
 		/* In-place operation: out[i] = a[i] - out[i] */
-		while (length--) {
-			*dataOut = (*dataA++) * (*dataOut);
-			dataOut++;
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) - *((v4sf*) (dataOut + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) - *(dataOut + i);
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] - b[i] */
-		while (length--) {
-			*dataOut++ = (*dataA++) - (*dataB++);
+		for(i = 0; i < limit; i += 4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) - *((v4sf*) (dataB + i));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut+i) = *(dataA + i) - *(dataB + i);
+			i++;
 		}
 	}
 }
