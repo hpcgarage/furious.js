@@ -24,7 +24,7 @@ module.exports = function(grunt) {
 			build: ["Gruntfile.js"]
 		},
 
-		browserify: {
+		browserify: {	
 			library: {
 				options: {
 					exclude: ["node-webcl"],
