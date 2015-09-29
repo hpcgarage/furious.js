@@ -1,7 +1,7 @@
 #include <stdio.h>
 
 int test() {
-    return 9;
+    return 15;
 }
 
 float floattest() {
