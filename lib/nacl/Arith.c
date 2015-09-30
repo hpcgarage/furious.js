@@ -2413,9 +2413,21 @@ static void maxF64(size_t length, const double data[restrict static length], dou
 }
 
 static void sumF32(size_t length, const float data[restrict static length], float sumOut[restrict static 1]) {
+	size_t i;
+	v4sf vecSum = {0,0,0,0};
+	size_t limit = length - 4;
+	char leftOver;
+	for (i = 0; i < limit; i += 4) {
+		vecSum += *((v4sf*)(data + i));
+	}
 	float s = 0.0f;
-	while (length--) {
-		s += *data++;
+	leftOver = length -i;
+	while (leftOver--) {
+		s += *(data+i);
+		i++;
+	}
+	for (char i = 0; i < 4; ++i) {
+		s += *(((float*)(&vecSum)) + i);
 	}
 	*sumOut = s;
 }
