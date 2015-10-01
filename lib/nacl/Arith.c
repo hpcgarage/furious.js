@@ -1545,6 +1545,7 @@ static void addConstF32(size_t length, const float dataA[static length], double 
 		leftOver = length - i;
 		while(leftOver--) {
 			*(dataOut + i) = *(dataOut + i) + dataBF32;
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] + b */
@@ -1554,6 +1555,7 @@ static void addConstF32(size_t length, const float dataA[static length], double 
 		leftOver = length - i;
 		while(leftOver--) {
 			*(dataOut + i) = *(dataA + i) + dataBF32;
+			i++;
 		}
 	}
 }
@@ -1587,6 +1589,7 @@ static void subConstF32(size_t length, const float dataA[static length], double 
 		leftOver = length - i;
 		while(leftOver--) {
 			*(dataOut + i) = *(dataOut + i) - dataBF32;
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] - b */
@@ -1596,6 +1599,7 @@ static void subConstF32(size_t length, const float dataA[static length], double 
 		leftOver = length - i;
 		while(leftOver--) {
 			*(dataOut + i) = *(dataA + i) - dataBF32;
+			i++;
 		}
 	}
 }
@@ -1617,16 +1621,29 @@ static void subConstF64(size_t length, const double dataA[static length], double
 //TODO:fv4f doable
 static void mulConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
+	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	size_t i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] * b */
-		while (length--) {
-			*dataOut = (*dataOut) * dataBF32;
-			dataOut++;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) * dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) * dataBF32;
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] * b */
-		while (length--) {
-			*dataOut++ = (*dataA++) * dataBF32;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataA + i) * dataBF32;
+			i++;
 		}
 	}
 }
@@ -1648,16 +1665,29 @@ static void mulConstF64(size_t length, const double dataA[static length], double
 //TODO:fv4f doable
 static void divConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
+	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	size_t i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] / b */
-		while (length--) {
-			*dataOut = (*dataOut) / dataBF32;
-			dataOut++;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) / dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) / dataBF32;
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] / b */
-		while (length--) {
-			*dataOut++ = (*dataA++) / dataBF32;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) / dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataA + i) / dataBF32;
+			i++;
 		}
 	}
 }
@@ -1680,16 +1710,28 @@ static void divConstF64(size_t length, const double dataA[static length], double
 /* Unary element-wise operations */
 //TODO:fv4f doable
 static void negF32(size_t length, const float dataA[static length], float dataOut[static length]) {
+	size_t i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
-		/* In-place operation: out[i] = -out[i] */
-		while (length--) {
-			*dataOut = -(*dataOut);
-			dataOut++;
+		/* In-place operation: out[i] = out[i] - b */
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = -(*((v4sf*) (dataOut + i)));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = -(*(dataOut + i));
+			i++;
 		}
 	} else {
-		/* Non-destructive operation: out[i] = -a[i] */
-		while (length--) {
-			*dataOut++ = -(*dataA++);
+		/* Non-destructive operation: out[i] = a[i] - b */
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = -(*((v4sf*) (dataA + i)));
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = -(*(dataA + i));
+			i++;
 		}
 	}
 }
@@ -1980,17 +2022,32 @@ static void sqrtF64(size_t length, const double dataA[static length], double dat
 }
 //TODO:fv4f doable
 static void squareF32(size_t length, const float dataA[static length], float dataOut[static length]) {
+	size_t i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = sqrt(out[i]) */
-		while (length--) {
-			const float value = *dataOut;
-			*dataOut++ = value * value;
+		for (i = 0; i < limit; i+=4) {
+			const v4sf value = *((v4sf*) (dataOut + i));
+			*((v4sf*) (dataOut + i)) = value * value;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			const float value = *(dataOut + i);
+			*(dataOut + i) = value * value;
+			i++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = sqrt(a[i]) */
-		while (length--) {
-			const float value = *dataA++;
-			*dataOut++ = value * value;
+		for (i = 0; i < limit; i+=4) {
+			const v4sf value = *((v4sf*) (dataA + i));
+			*((v4sf*) (dataOut + i)) = value * value;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			const float value = *(dataOut + i);
+			*(dataOut + i) = value * value;
+			i++;
 		}
 	}
 }

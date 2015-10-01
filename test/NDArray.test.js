@@ -351,11 +351,25 @@ describe("NDArray", function() {
 					expect(y).to.deep.equal([-0.5, -2, -4.5]);
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function() {
+				var x = context.array([1, 4, 9],new furious.DataType("f32"));
+				var y = x.div(-2);
+				y.get(function(y) {
+					expect(y).to.deep.equal([-0.5, -2, -4.5]);
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function() {
 				var x = context.array([[1, 4], [9, -17]]);
 				var y = x.div(-4);
 				y.get(function(y) {
 					expect(y).to.deep.equal([[-0.25, -1], [-2.25, 4.25]]);
+				});
+			});
+			it("Correct result for 1-dimensional f32 arrays", function() {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var y = x.div(-2);
+				y.get(function(y) {
+					expect(y).to.deep.equal([-0.5, -2, -4.5]);
 				});
 			});
 		});
