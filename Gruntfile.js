@@ -57,7 +57,7 @@ module.exports = function(grunt) {
 					}
 				},
 				files: {
-					"furious-asmjs-worker.js": ["lib/js/AsmJSWorker.js"]
+					"furious-asmjs-worker.js": ["lib/asmjs/AsmJSWorker.js"]
 				}
 			},
 			test: {
