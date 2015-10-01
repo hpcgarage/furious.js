@@ -1361,33 +1361,33 @@ static void divF32(size_t length, const float dataA[static length], const float 
 	size_t limit = length - 4;
 	char leftOver;
 	if (dataOut == dataA) {
-		/* In-place operation: out[i] = out[i] * b[i] */
+		/* In-place operation: out[i] = out[i] / b[i] */
 		for(i = 0; i < limit; i += 4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) / *((v4sf*) (dataB + i));
+			*((v4sf*) (dataOut + i)) = ((*((v4sf*) (dataOut + i))) / (*((v4sf*) (dataB + i))));
 		}
 		leftOver = length - i;
 		while(leftOver--) {
-			*(dataOut+i) = *(dataOut + i) / *(dataB + i);
+			*(dataOut+i) = ((*(dataOut + i)) / (*(dataB + i)));
 			i++;
 		}
 	} else if (dataOut == dataB) {
-		/* In-place operation: out[i] = a[i] * out[i] */
+		/* In-place operation: out[i] = a[i] / out[i] */
 		for(i = 0; i < limit; i += 4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) / *((v4sf*) (dataOut + i));
+			*((v4sf*) (dataOut + i)) = ((*((v4sf*) (dataA + i))) / (*((v4sf*) (dataOut + i))));
 		}
 		leftOver = length - i;
 		while(leftOver--) {
-			*(dataOut+i) = *(dataA + i) / *(dataOut + i);
+			*(dataOut+i) = ((*(dataA + i)) / (*(dataOut + i)));
 			i++;
 		}
 	} else {
-		/* Non-destructive operation: out[i] = a[i] * b[i] */
+		/* Non-destructive operation: out[i] = a[i] / b[i] */
 		for(i = 0; i < limit; i += 4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) / *((v4sf*) (dataB + i));
+			*((v4sf*) (dataOut + i)) = ((*((v4sf*) (dataA + i))) / (*((v4sf*) (dataB + i))));
 		}
 		leftOver = length - i;
 		while(leftOver--) {
-			*(dataOut+i) = *(dataA + i) / *(dataB + i);
+			*(dataOut+i) = (*(dataA + i)) / *(dataB + i);
 			i++;
 		}
 	}
@@ -1575,16 +1575,27 @@ static void addConstF64(size_t length, const double dataA[static length], double
 //TODO:fv4f doable
 static void subConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
+	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	size_t i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] - b */
-		while (length--) {
-			*dataOut = (*dataOut) - dataBF32;
-			dataOut++;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) - dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) - dataBF32;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] - b */
-		while (length--) {
-			*dataOut++ = (*dataA++) - dataBF32;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) - dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataA + i) - dataBF32;
 		}
 	}
 }
