@@ -28,6 +28,8 @@ static void lae2F32(size_t length, const float dataA[static length], const float
 static void lae2F64(size_t length, const double dataA[static length], const double dataB[static length], double dataOut[static length]);
 
 typedef void (*BinaryConstOpFunction)(size_t, const void*, double, void*);
+static void roundF32(size_t length, const float dataA[static length], const float dataB, float dataOut[static length]);
+static void roundF64(size_t length, const double dataA[static length], const double dataB, double dataOut[static length]);
 static void addConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
 static void addConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
 static void subConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
@@ -36,10 +38,10 @@ static void mulConstF32(size_t length, const float dataA[static length], double 
 static void mulConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
 static void divConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
 static void divConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
-static void roundConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
-static void roundConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
-static void matPConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
-static void matPConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
+// static void roundConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
+// static void roundConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
+// static void matPConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
+// static void matPConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
 
 typedef void (*UnaryOpFunction)(size_t, const void*, void*);
 static void negF32(size_t length, const float dataInt[static length], float dataOut[static length]);
@@ -1528,19 +1530,30 @@ static void roundF64(size_t length, const double dataA[static length], const dou
 	}
 }
 /* Binary element-wise operations with a constant */
-
+//TODO: fv4f doable
 static void addConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
+	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	size_t i;
+	size_t limit = length - 4;
+	char leftOver;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] + b */
-		while (length--) {
-			*dataOut = (*dataOut) + dataBF32;
-			dataOut++;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) + dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) + dataBF32;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = a[i] + b */
-		while (length--) {
-			*dataOut++ = (*dataA++) + dataBF32;
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) + dataBV4F32;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataA + i) + dataBF32;
 		}
 	}
 }
@@ -1559,7 +1572,7 @@ static void addConstF64(size_t length, const double dataA[static length], double
 		}
 	}
 }
-
+//TODO:fv4f doable
 static void subConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
 	if (dataOut == dataA) {
@@ -1590,7 +1603,7 @@ static void subConstF64(size_t length, const double dataA[static length], double
 		}
 	}
 }
-
+//TODO:fv4f doable
 static void mulConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
 	if (dataOut == dataA) {
@@ -1621,7 +1634,7 @@ static void mulConstF64(size_t length, const double dataA[static length], double
 		}
 	}
 }
-
+//TODO:fv4f doable
 static void divConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
 	if (dataOut == dataA) {
@@ -1654,7 +1667,7 @@ static void divConstF64(size_t length, const double dataA[static length], double
 }
 
 /* Unary element-wise operations */
-
+//TODO:fv4f doable
 static void negF32(size_t length, const float dataA[static length], float dataOut[static length]) {
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = -out[i] */
@@ -1684,7 +1697,7 @@ static void negF64(size_t length, const double dataA[static length], double data
 		}
 	}
 }
-
+//TODO:fv4f doable?
 static void absF32(size_t length, const float dataA[static length], float dataOut[static length]) {
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = abs(out[i]) */
@@ -1954,7 +1967,7 @@ static void sqrtF64(size_t length, const double dataA[static length], double dat
 		}
 	}
 }
-
+//TODO:fv4f doable
 static void squareF32(size_t length, const float dataA[static length], float dataOut[static length]) {
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = sqrt(out[i]) */
@@ -2178,7 +2191,7 @@ static void arctanF64(size_t length, const double dataA[static length], double d
 		}
 	}
 }
-
+//TODO:fv4f doable?
 static void degreesF32(size_t length, const float dataA[static length], float dataOut[static length]) {
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = log(out[i]) */
