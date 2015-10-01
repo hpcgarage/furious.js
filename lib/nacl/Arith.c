@@ -2261,16 +2261,30 @@ static void arctanF64(size_t length, const double dataA[static length], double d
 }
 //TODO:fv4f doable?
 static void degreesF32(size_t length, const float dataA[static length], float dataOut[static length]) {
+	int i;
+	size_t limit = length - 4;
+	char leftOver;
+	v4sf oneEighty = {180, 180, 180, 180};
+	v4sf M_PIV4sf = {M_PI, M_PI, M_PI, M_PI};
 	if (dataOut == dataA) {
-		/* In-place operation: out[i] = log(out[i]) */
-		while (length--) {
-			*dataOut = (*dataOut) * 180/M_PI;
-			dataOut++;
+		/* In-place operation: out[i] = out[i] * 180 / pi */
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) * oneEighty / M_PIV4sf;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) * 180 / M_PI;
+			i++;
 		}
 	} else {
-		/* Non-destructive operation: out[i] = log(a[i]) */
-		while (length--) {
-			*dataOut++ = (*dataA++) * 180/M_PI;
+		/* Non-destructive operation: out[i] = a[i] * 180 / M_PI */
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * oneEighty / M_PIV4sf;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) * 180 / M_PI;
+			i++;
 		}
 	}
 }
@@ -2291,16 +2305,30 @@ static void degreesF64(size_t length, const double dataA[static length], double 
 }
 
 static void radiansF32(size_t length, const float dataA[static length], float dataOut[static length]) {
+	int i;
+	size_t limit = length - 4;
+	char leftOver;
+	v4sf oneEighty = {180, 180, 180, 180};
+	v4sf M_PIV4sf = {M_PI, M_PI, M_PI, M_PI};
 	if (dataOut == dataA) {
-		/* In-place operation: out[i] = log(out[i]) */
-		while (length--) {
-			*dataOut = (*dataOut) * M_PI/180;
-			dataOut++;
+		/* In-place operation: out[i] = out[i] * pi / 180*/
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) * M_PIV4sf / oneEighty;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) * M_PI / 180;
+			i++;
 		}
 	} else {
-		/* Non-destructive operation: out[i] = log(a[i]) */
-		while (length--) {
-			*dataOut++ = (*dataA++) * M_PI/180;
+		/* Non-destructive operation: out[i] = a[i] * Pi / 180 */
+		for (i = 0; i < limit; i+=4) {
+			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * M_PIV4sf / oneEighty;
+		}
+		leftOver = length - i;
+		while(leftOver--) {
+			*(dataOut + i) = *(dataOut + i) * M_PI / 180;
+			i++;
 		}
 	}
 }
