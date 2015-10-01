@@ -107,9 +107,27 @@ describe("NDArray", function() {
 					done();
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function(done) {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var y = context.array([8, -1, 10], new furious.DataType("f32"));
+				var z = x.add(y);
+				z.get(function(z) {
+					expect(z).to.deep.equal([9, 3, 19]);
+					done();
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function(done) {
 				var x = context.array([[1, 4], [9, -17]]);
 				var y = context.array([[8, -1], [10, -21]]);
+				var z = x.add(y);
+				z.get(function(result) {
+					expect(result).to.deep.equal([[9, 3], [19, -38]]);
+					done();
+				});
+			});
+			it("Correct result for 2-dimensional f32 arrays", function(done) {
+				var x = context.array([[1, 4], [9, -17]], new furious.DataType("f32"));
+				var y = context.array([[8, -1], [10, -21]], new furious.DataType("f32"));
 				var z = x.add(y);
 				z.get(function(result) {
 					expect(result).to.deep.equal([[9, 3], [19, -38]]);
@@ -126,11 +144,27 @@ describe("NDArray", function() {
 					done();
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function(done) {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var z = x.add(-7);
+				z.get(function(z) {
+					expect(z).to.deep.equal([-6, -3, 2]);
+					done();
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function(done) {
 				var x = context.array([[1, 4], [9, -17]]);
 				var z = x.add(42);
 				z.get(function(z) {
 					expect(z).to.deep.equal([[43, 46], [51, 25]]);
+					done();
+				});
+			});
+			it("Correct result for 2-dimensional f32 arrays", function(done) {
+				var x = context.array([[1, 4, 6], [9, -17, 5]], new furious.DataType("f32"));
+				var z = x.add(42);
+				z.get(function(z) {
+					expect(z).to.deep.equal([[43, 46, 48], [51, 25, 47]]);
 					done();
 				});
 			});
@@ -147,9 +181,27 @@ describe("NDArray", function() {
 					done();
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function(done) {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var y = context.array([8, -1, 10], new furious.DataType("f32"));
+				var z = x.sub(y);
+				z.get(function(result) {
+					expect(result).to.deep.equal([-7, 5, -1]);
+					done();
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function(done) {
 				var x = context.array([[1, 4], [9, -17]]);
 				var y = context.array([[8, -1], [10, -21]]);
+				var z = x.sub(y);
+				z.get(function(result) {
+					expect(result).to.deep.equal([[-7, 5], [-1, 4]]);
+					done();
+				});
+			});
+			it("Correct result for 2-dimensional arrays", function(done) {
+				var x = context.array([[1, 4], [9, -17]], new furious.DataType("f32"));
+				var y = context.array([[8, -1], [10, -21]], new furious.DataType("f32"));
 				var z = x.sub(y);
 				z.get(function(result) {
 					expect(result).to.deep.equal([[-7, 5], [-1, 4]]);
@@ -166,8 +218,24 @@ describe("NDArray", function() {
 					done();
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function(done) {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var y = x.sub(-7);
+				y.get(function(y) {
+					expect(y).to.deep.equal([8, 11, 16]);
+					done();
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function(done) {
 				var x = context.array([[1, 4], [9, -17]]);
+				var y = x.sub(42);
+				y.get(function(y) {
+					expect(y).to.deep.equal([[-41, -38], [-33, -59]]);
+					done();
+				});
+			});
+			it("Correct result for 2-dimensional f32 arrays", function(done) {
+				var x = context.array([[1, 4], [9, -17]], new furious.DataType("f32"));
 				var y = x.sub(42);
 				y.get(function(y) {
 					expect(y).to.deep.equal([[-41, -38], [-33, -59]]);
@@ -187,9 +255,27 @@ describe("NDArray", function() {
 					done();
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function(done) {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var y = context.array([8, -1, 10] ,new furious.DataType("f32"));
+				var z = x.mul(y);
+				z.get(function(z) {
+					expect(z).to.deep.equal([8, -4, 90]);
+					done();
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function(done) {
 				var x = context.array([[1, 4], [9, -17]]);
 				var y = context.array([[8, -1], [10, -21]]);
+				var z = x.mul(y);
+				z.get(function(z) {
+					expect(z).to.deep.equal([[8, -4], [90, 357]]);
+					done();
+				});
+			});
+			it("Correct result for 2-dimensional f32 arrays", function(done) {
+				var x = context.array([[1, 4], [9, -17]], new furious.DataType("f32"));
+				var y = context.array([[8, -1], [10, -21]], new furious.DataType("f32"));
 				var z = x.mul(y);
 				z.get(function(z) {
 					expect(z).to.deep.equal([[8, -4], [90, 357]]);
@@ -227,11 +313,31 @@ describe("NDArray", function() {
 					done();
 				});
 			});
+			it("Correct result for 1-dimensional f32 arrays", function(done) {
+				var x = context.array([1, 4, 9], new furious.DataType("f32"));
+				var y = context.array([2, -4, 8], new furious.DataType("f32"));
+				var z = x.div(y);
+				z.get(function(z) {
+					console.log(z);
+					expect(z).to.deep.equal([0.5, -1, 1.125]);
+					done();
+				});
+			});
 			it("Correct result for 2-dimensional arrays", function(done) {
 				var x = context.array([[1, 4], [9, -17]]);
 				var y = context.array([[-2, 4], [-8, 16]]);
 				var z = x.div(y);
 				z.get(function(z) {
+					expect(z).to.deep.equal([[-0.5, 1], [-1.125, -1.0625]]);
+					done();
+				});
+			});
+			it("Correct result for 2-dimensional f32 arrays", function(done) {
+				var x = context.array([[1, 4], [9, -17]], new furious.DataType("f32"));
+				var y = context.array([[-2, 4], [-8, 16]], new furious.DataType("f32"));
+				var z = x.div(y);
+				z.get(function(z) {
+					console.log(z);
 					expect(z).to.deep.equal([[-0.5, 1], [-1.125, -1.0625]]);
 					done();
 				});
