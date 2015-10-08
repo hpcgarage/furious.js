@@ -115,6 +115,11 @@ static void dotF64(size_t aStride, size_t bOuterStride, size_t bInnerStride, siz
 	const double b[restrict static bOuterStride*reductionLength*bInnerStride],
 	double out[restrict static aStride*bOuterStride*bInnerStride]);
 
+// TODO: How to return L, U, and P?
+typedef void (*LUPDecompositionFunction)(size_t, void*, void*, void*);
+static void lupdecompositionF32(size_t n, float dataL[restrict static n*n], float outU[restrict static n*n], float outP[restrict static n*n]);
+static void lupdecompositionF64(size_t n, double dataL[restrict static n*n], double outU[restrict static n*n], double outP[restrict static n*n]);
+
 typedef void (*CholeskyDecompositionFunction)(size_t, void*, bool);
 static void choleskyF32(size_t n, float data[restrict static n*n], bool isLower);
 static void choleskyF64(size_t n, double data[restrict static n*n], bool isLower);
@@ -315,6 +320,11 @@ static const AxisReduceOpFunction axisReductionFunctions[][FJS_DataType_Max] = {
 static const DotOpFunction dotFunctions[] = {
 	[FJS_DataType_F64] = (DotOpFunction) dotF64,
 	[FJS_DataType_F32] = (DotOpFunction) dotF32
+};
+
+static const LUPDecompositionFunction LUPDecompositionFunctions[] = {
+	[FJS_DataType_F64] = (LUPDecompositionFunction) lupdecompositionF64,
+	[FJS_DataType_F32] = (LUPDecompositionFunction) lupdecompositionF32
 };
 
 static const CholeskyDecompositionFunction choleskyDecompositionFunctions[] = {
@@ -939,6 +949,118 @@ enum FJS_Error FJS_Execute_DotOperation(PP_Instance instance,
 	if (idB < 0) {
 		FJS_NDArray_Delete(arrayB);
 		FJS_ReleaseId(instance, __builtin_abs(idB));
+	}
+
+	return FJS_Error_Ok;
+}
+
+enum FJS_Error FJS_Execute_LUPDecomposition(PP_Instance instance,
+	int32_t idA,
+	uint32_t idOutL,
+	uint32_t idOutU,
+	uint32_t idOutP)
+{
+	/* Validate the id for input array A and get NDArray object for array A */
+	struct NDArray* arrayA = FJS_GetPointerFromId(instance, __builtin_abs(idA));
+	if (arrayA == NULL) {
+		return FJS_Error_InvalidId;
+	}
+
+	/* Load information on the input array A */
+	const uint32_t lengthA = arrayA->length;
+	const uint32_t dimensionsA = arrayA->dimensions;
+	const uint32_t* shapeA = FJS_NDArray_GetShape(arrayA);
+	const void* dataA = FJS_NDArray_GetData(arrayA);
+	const enum FJS_DataType dataTypeA = arrayA->dataType;
+
+	/* Check the dimension of input array A */
+	if (dimensionsA != 2) {
+		return FJS_Error_InvalidDimensions;
+	}
+
+	/* Check that A is a square matrix */
+	if (shapeA[0] != shapeA[1]) {
+		return FJS_Error_InvalidShape;
+	}
+
+	/*
+	 * Validate input data type and choose the compute function for this data type
+	 */
+	if ((uint32_t) dataTypeA >= FJS_DataType_Max) {
+		return FJS_Error_InvalidDataType;
+	}
+	const LUPDecompositionFunction computeFunction = LUPDecompositionFunctions[dataTypeA];
+	if (computeFunction == NULL) {
+		return FJS_Error_InvalidDataType;
+	}
+
+	/*
+	 * Try to get NDArray for the provided output id.
+	 * If there is an NDArray associated with the supplied id, validate it.
+	 * Otherwise, create an NDArray and associate it with the provided id.
+	 */
+	struct NDArray* arrayOutL = FJS_GetPointerFromId(instance, idOutL);
+	struct NDArray* arrayOutU = FJS_GetPointerFromId(instance, idOutU);
+	struct NDArray* arrayOutP = FJS_GetPointerFromId(instance, idOutP);
+	if (arrayOutL == NULL) {
+		/* Create output array */
+		arrayOutL = FJS_NDArray_Create(dimensionsA, lengthA, shapeA, dataTypeA);
+		if (arrayOutL == NULL) {
+			return FJS_Error_OutOfMemory;
+		}
+
+		/* Associate the output array with its id */
+		FJS_AllocateId(instance, idOutL, arrayOutL);
+	} else {
+		/* Load information on the output array */
+		const uint32_t lengthOutL = arrayOutL->length;
+		const uint32_t dimensionsOutL = arrayOutL->dimensions;
+		const uint32_t* shapeOutL = FJS_NDArray_GetShape(arrayOutL);
+		const enum FJS_DataType dataTypeOutL = arrayOutL->dataType;
+		const uint32_t lengthOutU = arrayOutU->length;
+		const uint32_t dimensionsOutU = arrayOutU->dimensions;
+		const uint32_t* shapeOutU = FJS_NDArray_GetShape(arrayOutU);
+		const enum FJS_DataType dataTypeOutU = arrayOutU->dataType;
+		const uint32_t lengthOutP = arrayOutP->length;
+		const uint32_t dimensionsOutP = arrayOutP->dimensions;
+		const uint32_t* shapeOutP = FJS_NDArray_GetShape(arrayOutP);
+		const enum FJS_DataType dataTypeOutP = arrayOutP->dataType;
+
+		/* Check the dimension of the output array */
+		if (dimensionsOutL != 2 || dimensionsOutU != 2 || dimensionsOutP != 2) {
+			return FJS_Error_InvalidDimensions;
+		}
+
+		/* Check that output array is a square matrix */
+		if (shapeOutL[0] != shapeOutL[1] || shapeOutU[0] != shapeOutU[1] || shapeOutP[0] != shapeOutP[1]) {
+			return FJS_Error_InvalidShape;
+		}
+
+		/* Check that output array has the same shape as input array */
+		if (shapeOutL[0] != shapeA[0] || shapeOutU[0] != shapeA[0] || shapeOutP[0] != shapeA[0]) {
+			return FJS_Error_MismatchingShape;
+		}
+
+		/* Check that the output array has the same data type as input array */
+		if (dataTypeOutL != dataTypeA || dataTypeOutU != dataTypeA || dataTypeOutP != dataTypeA) {
+			return FJS_Error_MismatchingDataType;
+		}
+	}
+	/* Initialize output array with input data (short-cut: no copy for in-place operation) */
+	void* dataOutL = FJS_NDArray_GetData(arrayOutL);
+	void* dataOutU = FJS_NDArray_GetData(arrayOutU);
+	void* dataOutP = FJS_NDArray_GetData(arrayOutP);
+	if (dataOutL != dataA) {
+		memcpy(dataOutL, dataA, lengthA * FJS_DataType_GetSize(dataTypeA));
+	}
+
+	/* Do the cholesky decomposition */
+	computeFunction(shapeA[0], dataOutL, dataOutU, dataOutP);
+
+	/* De-allocate input array if needed */
+	if (idA < 0) {
+		FJS_NDArray_Delete(arrayA);
+		FJS_ReleaseId(instance, -idA);
 	}
 
 	return FJS_Error_Ok;
@@ -2501,6 +2623,20 @@ static void dotF64(size_t aStride, size_t bOuterStride, size_t bInnerStride, siz
 				}
 			}
 		}
+	}
+}
+
+static void lupdecompositionF32(size_t n, float dataL[restrict static n*n], float dataU[restrict static n*n], float dataP[restrict static n*n]) {
+	// TODO: Implement
+	for (int i = 0; i < n*n; i++) {
+		dataL[i] = dataU[i] = dataP[i] = 98.71;
+	}
+}
+
+static void lupdecompositionF64(size_t n, double dataL[restrict static n*n], double dataU[restrict static n*n], double dataP[restrict static n*n]) {
+	// TODO: Implement
+	for (int i = 0; i < n*n; i++) {
+		dataL[i] = dataU[i] = dataP[i] = 98.71;
 	}
 }
 
