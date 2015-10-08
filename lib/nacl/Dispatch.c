@@ -255,6 +255,14 @@ enum FJS_Error FJS_Dispatch_Request(PP_Instance instance, const void* requestPoi
 				dot_operation_request->id_out);
 			break;
 		}
+		case FURIOUS__REQUEST__TYPE__LUP_DECOMPOSITION:
+		{
+			const Furious__LUPDecompositionRequest *lup_decomposition_request = request->lup_decomposition_request;
+			error = FJS_Execute_LUPDecomposition(instance,
+				lup_decomposition_request->id_a,
+				lup_decomposition_request->id_outL, lup_decomposition_request->id_outU, lup_decomposition_request->id_outP);
+			break;
+		}
 		case FURIOUS__REQUEST__TYPE__CHOLESKY_DECOMPOSITION:
 		{
 			const Furious__CholeskyDecompositionRequest *cholesky_decomposition_request = request->cholesky_decomposition_request;
