@@ -108,11 +108,11 @@ describe("NDArray", function() {
 				});
 			});
 			it("Correct result for 1-dimensional f32 arrays", function(done) {
-				var x = context.array([1, 4, 9], new furious.DataType("f32"));
-				var y = context.array([8, -1, 10], new furious.DataType("f32"));
+				var x = context.array([1, 4, 9, 1], new furious.DataType("f32"));
+				var y = context.array([8, -1, 10, 1], new furious.DataType("f32"));
 				var z = x.add(y);
 				z.get(function(z) {
-					expect(z).to.deep.equal([9, 3, 19]);
+					expect(z).to.deep.equal([9, 3, 19, 2]);
 					done();
 				});
 			});
@@ -318,7 +318,6 @@ describe("NDArray", function() {
 				var y = context.array([2, -4, 8], new furious.DataType("f32"));
 				var z = x.div(y);
 				z.get(function(z) {
-					console.log(z);
 					expect(z).to.deep.equal([0.5, -1, 1.125]);
 					done();
 				});
@@ -337,7 +336,6 @@ describe("NDArray", function() {
 				var y = context.array([[-2, 4], [-8, 16]], new furious.DataType("f32"));
 				var z = x.div(y);
 				z.get(function(z) {
-					console.log(z);
 					expect(z).to.deep.equal([[-0.5, 1], [-1.125, -1.0625]]);
 					done();
 				});

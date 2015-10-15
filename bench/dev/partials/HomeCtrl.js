@@ -157,7 +157,7 @@ angular.module('furiousBM.controllers')
                 $scope.$apply();
             })
         }
-        Benchmark((times + " size[100, 100] f64 matrix addition using " + backEnd), {
+        Benchmark((times + " size[100, 100] f32 matrix addition using " + backEnd), {
             "defer" : true,
             "fn": benchFunc,
             "onComplete" : onComp
@@ -178,6 +178,57 @@ angular.module('furiousBM.controllers')
             $scope.series[i] = backEnd;
             try{
                 testHelper3(backEnd);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
+
+    $scope.addF32 = [];
+    var testAddF32Helper = function testAddF32Helper(backEnd) {
+        furious.init(backEnd, function(context) {
+            var y = (context.array([[1, 4, 6], [9, -17, 5]] ,new furious.DataType("f32"))).retain();
+            var x = y.add(42);
+            context.barrier(function() {
+                context.fetch(x, function(jsx) {
+                    console.log(jsx);
+                    $scope.addF32.push(jsx);
+                    $scope.$apply();
+                })
+            })
+        })
+    }
+    $scope.testAddF32 = function tesetAddF32() {
+        for (var i = 0, limit = $scope.backEndOptions.length; i < limit; i++) {
+            var backEnd = $scope.backEndOptions[i];
+            $scope.series[i] = backEnd;
+            try{
+                testAddF32Helper(backEnd);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
+    $scope.subF32 = [];
+    var testSubF32Helper = function testSubF32Helper(backEnd) {
+        furious.init(backEnd, function(context) {
+            var y = (context.array([1,2,3],new furious.DataType("f32"))).retain();
+            var x = y.sub(y);
+            context.barrier(function() {
+                context.fetch(x, function(jsx) {
+                    console.log(jsx);
+                    $scope.subF32.push(jsx);
+                    $scope.$apply();
+                })
+            })
+        })
+    }
+    $scope.testSubF32 = function tesetSubF32() {
+        for (var i = 0, limit = $scope.backEndOptions.length; i < limit; i++) {
+            var backEnd = $scope.backEndOptions[i];
+            $scope.series[i] = backEnd;
+            try{
+                testSubF32Helper(backEnd);
             }catch(e){
                 console.log(e);
             }

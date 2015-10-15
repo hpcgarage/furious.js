@@ -20,12 +20,25 @@
       <canvas id="bar" class="chart chart-bar" chart-data="res2" chart-labels="TEST_NUMS"  chart-legend="true" chart-series="series"></canvas>
     </div>
   </div>
+
   <div>
     <h1>test matrix adding n matrix of size 100*100</h1>
     <button ng-click=runTest3()>Start Test</button><br/>
     <code>{{res3}}</code>
     <div class = "benchChart">
-      <canvas id="bar" class="chart chart-bar" chart-data="res3" chart-labels="TIMES"  chart-legend="true" chart-series="series">
+      <canvas id="bar" class="chart chart-bar" chart-data="res3" chart-labels="TIMES"  chart-legend="true" chart-series="series"></canvas>
     </div>
+  </div>
+
+  <div>
+    <h1>test matrix addf32</h1>
+    <button ng-click=testAddF32()>Start Test</button><br/>
+    <code>{{addF32}}</code>
+  </div>
+
+  <div>
+    <h1>test matrix subf32</h1>
+    <button ng-click=testSubF32()>Start Test</button><br/>
+    <code>{{subF32}}</code>
   </div>
 </div>

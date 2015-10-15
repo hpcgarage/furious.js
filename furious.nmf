@@ -3,7 +3,11 @@
 		"portable": {
 			"pnacl-translate": {
 				"url": "furious.pexe"
-			}
+			},
+            "pnacl-debug": {
+                "url": "furious.bc",
+                "optlevel": 0
+            }
 		}
 	}
 }
