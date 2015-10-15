@@ -38,10 +38,10 @@ static void mulConstF32(size_t length, const float dataA[static length], double 
 static void mulConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
 static void divConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
 static void divConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
-// static void roundConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
-// static void roundConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
-// static void matPConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
-// static void matPConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
+static void roundConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
+static void roundConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
+static void matPConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]);
+static void matPConstF64(size_t length, const double dataA[static length], double dataB, double dataOut[static length]);
 
 typedef void (*UnaryOpFunction)(size_t, const void*, void*);
 static void negF32(size_t length, const float dataInt[static length], float dataOut[static length]);
