@@ -4,6 +4,7 @@
 #include <math.h>
 #include <sys/types.h>
 
+#include "SIMD.h"
 #include "Error.h"
 #include "DataType.h"
 #include "NDArray.h"
@@ -12,6 +13,7 @@
 #include "Strings.h"
 #include "IdMap.h"
 #include "Util.h"
+
 
 typedef void (*BinaryOpFunction)(size_t, const void*, const void*, void*);
 static void addF32(size_t length, const float dataA[static length], const float dataB[static length], float dataOut[static length]);
@@ -130,15 +132,6 @@ static void solveTriangularF64(size_t rows, size_t columns,
 	const double dataA[restrict static rows*rows],
 	double dataB[restrict static rows*columns],
 	bool transpose, bool isLower, bool unitDiagonal);
-
-typedef float v4sf __attribute__((__vector_size__(16)));
-
-inline v4sf v4sf_load(const float* a) {
-	return *((const v4sf*)a);
-}
-inline void v4sf_store(float* a, v4sf x) {
-	*((v4sf*)a) = x;
-}
 
 static const BinaryOpFunction binaryOpFunctions[][FJS_DataType_Max] = {
 	[FJS_BinaryOperationType_Add] = {
@@ -1546,8 +1539,8 @@ static void roundF64(size_t length, const double dataA[static length], const dou
 /* Binary element-wise operations with a constant */
 //TODO: fv4f doable
 static void addConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
- 	const float dataBF32 = dataB;
-	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	const float dataBF32 = dataB;
+	const v4sf dataBV4F32 = v4sf_set1(dataBF32);
 	int i;
 	int limit = (int)length - 4;
 	char leftOver;
@@ -1623,7 +1616,7 @@ static void addConstF64(size_t length, const double dataA[static length], double
 //TODO:fv4f doable
 static void subConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
-	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	const v4sf dataBV4F32 = v4sf_set1(dataBF32);
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] - b */
 		while(length >= 4) {
@@ -1666,7 +1659,7 @@ static void subConstF64(size_t length, const double dataA[static length], double
 //TODO:fv4f doable
 static void mulConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
-	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	const v4sf dataBV4F32 = v4sf_set1(dataBF32);
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] * b */
 		while(length >= 4) {
@@ -1709,7 +1702,7 @@ static void mulConstF64(size_t length, const double dataA[static length], double
 //TODO:fv4f doable
 static void divConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
 	const float dataBF32 = dataB;
-	const v4sf dataBV4F32 = {dataBF32, dataBF32, dataBF32, dataBF32};
+	const v4sf dataBV4F32 = v4sf_set1(dataBF32);
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] / b */
 		while(length >= 4) {
@@ -1826,14 +1819,25 @@ static void absF64(size_t length, const double dataA[static length], double data
 
 static void expF32(size_t length, const float dataA[static length], float dataOut[static length]) {
 	if (dataOut == dataA) {
-		/* In-place operation: out[i] = exp(out[i]) */
-		while (length--) {
+		/* In-place operation: out[i] = out[i] - b */
+		while(length >= 4) {
+			v4sf_store(dataOut, (exp_v4sf(v4sf_load(dataOut))));
+			dataOut += 4;
+			length -= 4;
+		}
+		while(length--) {
 			*dataOut = expf(*dataOut);
 			dataOut++;
 		}
 	} else {
-		/* Non-destructive operation: out[i] = exp(a[i]) */
-		while (length--) {
+		/* Non-destructive operation: out[i] = a[i] - b */
+		while(length >= 4) {
+			v4sf_store(dataOut, (exp_v4sf(v4sf_load(dataA))));
+			dataOut += 4;
+			dataA += 4;
+			length -= 4;
+		}
+		while(length--) {
 			*dataOut++ = expf(*dataA++);
 		}
 	}
