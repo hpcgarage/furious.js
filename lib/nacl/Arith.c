@@ -1658,7 +1658,7 @@ static void subConstF64(size_t length, const double dataA[static length], double
 }
 //TODO:fv4f doable
 static void mulConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
-	const float dataBF32 = dataB;
+	const float dataBF32 = (float)dataB;
 	const v4sf dataBV4F32 = v4sf_set1(dataBF32);
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] * b */
@@ -1701,7 +1701,7 @@ static void mulConstF64(size_t length, const double dataA[static length], double
 }
 //TODO:fv4f doable
 static void divConstF32(size_t length, const float dataA[static length], double dataB, float dataOut[static length]) {
-	const float dataBF32 = dataB;
+	const float dataBF32 = (float) dataB;
 	const v4sf dataBV4F32 = v4sf_set1(dataBF32);
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = out[i] / b */
@@ -2307,91 +2307,45 @@ static void arctanF64(size_t length, const double dataA[static length], double d
 		}
 	}
 }
-//TODO:fv4f doable?
+//TODO: degrees and radians unittest
 static void degreesF32(size_t length, const float dataA[static length], float dataOut[static length]) {
-	int i;
-	int limit = length - 4;
-	char leftOver;
-	v4sf oneEighty = {180, 180, 180, 180};
-	v4sf M_PIV4sf = {M_PI, M_PI, M_PI, M_PI};
-	if (dataOut == dataA) {
-		/* In-place operation: out[i] = out[i] * 180 / pi */
-		for (i = 0; i < limit; i+=4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) * oneEighty / M_PIV4sf;
-		}
-		leftOver = length - i;
-		while(leftOver--) {
-			*(dataOut + i) = *(dataOut + i) * 180 / M_PI;
-			i++;
-		}
-	} else {
-		/* Non-destructive operation: out[i] = a[i] * 180 / M_PI */
-		for (i = 0; i < limit; i+=4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * oneEighty / M_PIV4sf;
-		}
-		leftOver = length - i;
-		while(leftOver--) {
-			*(dataOut + i) = *(dataOut + i) * 180 / M_PI;
-			i++;
-		}
-	}
+	const double rad2deg_factor = 180.0 / M_PI;
+	return mulConstF32(length, dataA, rad2deg_factor, dataOut);
 }
 
 static void degreesF64(size_t length, const double dataA[static length], double dataOut[static length]) {
+	const double rad2deg_factor = 180.0 / M_PI;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = log(out[i]) */
 		while (length--) {
-			*dataOut = (*dataOut) * 180/M_PI;
+			*dataOut = (*dataOut) * rad2deg_factor;
 			dataOut++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = log(a[i]) */
 		while (length--) {
-			*dataOut++ = (*dataA++) * 180/M_PI;
+			*dataOut++ = (*dataA++) * rad2deg_factor;
 		}
 	}
 }
 
 static void radiansF32(size_t length, const float dataA[static length], float dataOut[static length]) {
-	int i;
-	int limit = length - 4;
-	char leftOver;
-	v4sf oneEighty = {180, 180, 180, 180};
-	v4sf M_PIV4sf = {M_PI, M_PI, M_PI, M_PI};
-	if (dataOut == dataA) {
-		/* In-place operation: out[i] = out[i] * pi / 180*/
-		for (i = 0; i < limit; i+=4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataOut + i)) * M_PIV4sf / oneEighty;
-		}
-		leftOver = length - i;
-		while(leftOver--) {
-			*(dataOut + i) = *(dataOut + i) * M_PI / 180;
-			i++;
-		}
-	} else {
-		/* Non-destructive operation: out[i] = a[i] * Pi / 180 */
-		for (i = 0; i < limit; i+=4) {
-			*((v4sf*) (dataOut + i)) = *((v4sf*) (dataA + i)) * M_PIV4sf / oneEighty;
-		}
-		leftOver = length - i;
-		while(leftOver--) {
-			*(dataOut + i) = *(dataOut + i) * M_PI / 180;
-			i++;
-		}
-	}
+	const double deg2rad_factor = M_PI / 180.0;
+	return mulConstF32(length, dataA, deg2rad_factor, dataOut);
 }
 
 static void radiansF64(size_t length, const double dataA[static length], double dataOut[static length]) {
+	const double deg2rad_factor = M_PI / 180.0;
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = log(out[i]) */
 		while (length--) {
-			*dataOut = (*dataOut) * M_PI/180;
+			*dataOut = (*dataOut) * deg2rad_factor;
 			dataOut++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = log(a[i]) */
 		while (length--) {
-			*dataOut++ = (*dataA++) * M_PI/180;
+			*dataOut++ = (*dataA++) * deg2rad_factor;
 		}
 	}
 }

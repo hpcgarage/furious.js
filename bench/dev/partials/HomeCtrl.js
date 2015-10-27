@@ -10,6 +10,7 @@ angular.module('furiousBM.controllers')
 .controller('HomeCtrl', ['$window','$scope', function($window, $scope){
     var furious = $window.furious;
     var TEST_SIZES = [10,100, 500, 1000, 5000, 10000, 50000, 100000];
+    var f32Type = new furious.DataType("f32")
     //labels
     $scope.labels = TEST_SIZES;
     $scope.series = [];
@@ -32,7 +33,7 @@ angular.module('furiousBM.controllers')
             "defer" : true,
 
             "fn":function(deferred) {
-                var x = context.empty([1,size]);
+                var x = context.empty([1,size], f32Type);
                 context.barrier(function() {
                     deferred.resolve();
                 })
@@ -82,7 +83,7 @@ angular.module('furiousBM.controllers')
 
             "fn":function(deferred) {
                 for (var i = 0; i < num; i++) {
-                    var x = context.empty([1,SIZE]);
+                    var x = context.empty([1,SIZE], f32Type);
                 }
                 context.barrier(function() {
                     deferred.resolve();
@@ -133,7 +134,7 @@ angular.module('furiousBM.controllers')
     }
     var run3 = function run3(times, context, backEnd) {
         var arrs = $scope.arrGen(1, 100, 100);
-        var x = (context.array(arrs[0],new furious.DataType("f32"))).retain();
+        var x = (context.array(arrs[0], f32Type)).retain();
         // var y = (context.array([1,2,3,4,5,6,7,8,9,10],new furious.DataType("f32"))).retain();
         // var test = y.sum();
         // context.barrier(function() {
@@ -187,7 +188,7 @@ angular.module('furiousBM.controllers')
     $scope.addF32 = [];
     var testAddF32Helper = function testAddF32Helper(backEnd) {
         furious.init(backEnd, function(context) {
-            var y = (context.array([[1, 4, 6], [9, -17, 5]] ,new furious.DataType("f32"))).retain();
+            var y = (context.array([[1, 4, 6], [9, -17, 5]] ,f32Type)).retain();
             var x = y.add(42);
             context.barrier(function() {
                 context.fetch(x, function(jsx) {
@@ -212,7 +213,7 @@ angular.module('furiousBM.controllers')
     $scope.subF32 = [];
     var testSubF32Helper = function testSubF32Helper(backEnd) {
         furious.init(backEnd, function(context) {
-            var y = (context.array([1,2,3],new furious.DataType("f32"))).retain();
+            var y = (context.array([1,2,3], f32Type)).retain();
             var x = y.sub(y);
             context.barrier(function() {
                 context.fetch(x, function(jsx) {
@@ -238,7 +239,7 @@ angular.module('furiousBM.controllers')
     $scope.expF32 = [];
     var testExpF32Helper = function testExpF32Helper(backEnd) {
         furious.init(backEnd, function(context) {
-            var y = (context.array([1,2,3,4,5,6,7,8,9,10],new furious.DataType("f32"))).retain();
+            var y = (context.array([10, 11, 12, 13, 14, 15, 16, 17], f32Type)).retain();
             var x = context.exp(y);
             context.barrier(function() {
                 context.fetch(x, function(jsx) {

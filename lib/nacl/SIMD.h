@@ -1,10 +1,11 @@
 #pragma once
 #include <stdlib.h>
 #include <stdint.h>
-#include <math.h>
 #include <sys/types.h>
+#include <math.h>
 #define V4UI_TRUE  (v4ui_set1(0xffffffff))
 #define V4UI_FALSE  (v4ui_set1(0x0))
+#define FLOAT_INFINITY (0x7f800000)
 typedef float v4sf __attribute__((__vector_size__(16)));
 typedef unsigned int v4ui __attribute__((__vector_size__(16)));
 // typedef unsigned __int128 u_v4sf_128;
@@ -52,6 +53,11 @@ inline v4sf v4sf_min(v4sf x, v4sf y) {
     v4ui xSmaller = x < y;
     v4ui ans = (*((v4ui *)(&x)) & xSmaller) | (*((v4ui *)(&x)) & ~xSmaller);
     return *((v4sf*) &ans);
+}
+
+inline v4sf v4sf_GET_INFINITY() {
+    v4ui ans = v4ui_set1(FLOAT_INFINITY);
+    return *((v4sf *)(& ans));
 }
 
 inline v4sf v4sf_slli(v4sf x, v4sf y) {
