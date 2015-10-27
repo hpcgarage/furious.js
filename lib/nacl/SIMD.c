@@ -14,10 +14,10 @@ v4sf exp_v4sf(v4sf x) {
     const v4sf table0123 = v4sf_set(0x1.4BFDAEp+0f, 0x1.306FE0p+0f, 0x1.172B84p+0f, 0x1.000000p+0f);
     const v4sf table4567 = v4sf_set(0x1.D5818Ep+0f, 0x1.AE89FAp+0f, 0x1.8ACE54p+0f, 0x1.6A09E6p+0f);
 
-    const uv4s minExponent = uv4s_set1(-126 << 23);
-    const uv4s maxExponent = uv4s_set1(127 << 23);
-    const uv4s defaultExponent = uv4s_set1(0x3F800000u);
-    const uv4s mantissaMask = uv4s_set1(0x007FFFF8);
+    const v4ui minExponent = v4ui_set1(-126 << 23);
+    const v4ui maxExponent = v4ui_set1(127 << 23);
+    const v4ui defaultExponent = v4ui_set1(0x3F800000u);
+    const v4ui mantissaMask = v4ui_set1(0x007FFFF8);
 
     v4sf t = v4sf_macc(x, log2e, magicBias);
     v4sf e1 = v4sf_slli(v4sf_and(t, mantissaMask), v4sf_set1(20));
