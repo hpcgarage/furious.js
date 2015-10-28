@@ -242,6 +242,7 @@ angular.module('furiousBM.controllers')
             var y = (context.array([10, 11, 12, 13, 14, 15, 16, 17], f32Type)).retain();
             var x = context.exp(y);
             context.barrier(function() {
+                console.log(backEnd);
                 context.fetch(x, function(jsx) {
                     console.log(jsx);
                     $scope.expF32.push(jsx);
