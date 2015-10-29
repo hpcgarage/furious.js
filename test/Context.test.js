@@ -1644,67 +1644,38 @@ describe("Context", function(){
 		});
 	});
 	describe("LUP decomposition", function() {
-		var xRef = [[ 11,  7,   23], // Input
-		            [ 29,  8,   13],
-		            [ 19,  31,  3]];
-		var lRef = [[ 1.0,                    0.0,                     0.0],
-		            [ 0.65517241379310342531, 1.0,                     0.0],
-		            [ 0.37931034482758618775, 0.15394912985274430972,  1.0]];
-		var uRef = [[ 29.0,                   8.0,                     13.0],
-		            [ 0.0,                    25.75862068965517437391, -5.51724137931034519511],
-		            [ 0.0,                    0.0,                     18.91834002677376247448]];
-		var pRef = [[ 0.0,  1.0,  0.0],
-		            [ 0.0,  0.0,  1.0],
-		            [ 1.0,  0.0,  0.0]];
+	 	var xRef = [[ 11,  7,   23], // Input
+	 	            [ 29,  8,   13],
+	 	            [ 19,  31,  3]];
+	 	var lRef = [[ 1.0,                    0.0,                     0.0],
+	 	            [ 0.65517241379310342531, 1.0,                     0.0],
+	 	            [ 0.37931034482758618775, 0.15394912985274430972,  1.0]];
+	 	var uRef = [[ 29.0,                   8.0,                     13.0],
+	 	            [ 0.0,                    25.75862068965517437391, -5.51724137931034519511],
+	 	            [ 0.0,                    0.0,                     18.91834002677376247448]];
+	 	var pRef = [[ 0.0,  1.0,  0.0],
+	 	            [ 0.0,  0.0,  1.0],
+	 	            [ 1.0,  0.0,  0.0]];
+
 		var dataTypes = ["f32", "f64"];
-		it("Produces an output matrix of the same shape as input matrix", function() {
+		it("produces an output matrix of the same shape as input matrix", function() {
 			var x = context.array([[1, 0], [0, 1]]);
 			var c = context.lupdecomposition(x)[0];
 			expect(c.shape).to.deep.equal(x.shape);
 			c.invalidate();
 		});
-		it("Produces an output matrix of the same data type as input matrix", function() {
+		it("produces an output matrix of the same data type as input matrix", function() {
 			var x = context.array([[1, 0], [0, 1]]);
 			var c = context.lupdecomposition(x)[0];
 			expect(c.dataType).to.equal(x.dataType);
 			c.invalidate();
 		});
-		it("Produces a lower triangular matrix with kind = \"L\"", function(done) {
-			var x = context.array(xRef);
-			var lup = context.lupdecomposition(x);
-			var l = lup[0];
-			l.get(function(lVal) {
-				for (var i = 0; i < l.shape[0]; i++) {
-					expect(lVal[i][i]).to.equal(1.0);
-					for (var j = i + 1; j < l.shape[1]; j++) {
-						expect(lVal[i][j]).to.equal(0.0);
-					}
-				}
-				done();
-			});
-		});
-		it("Produces an upper triangular matrix with kind = \"U\"", function(done) {
-			var x = context.array(xRef);
-			var lup = context.lupdecomposition(x);
-			var u = lup[1];
-			u.get(function(uVal) {
-				for (var i = 0; i < u.shape[0]; i++) {
-					expect(uVal[i][i]).to.equal(1.0);
-					for (var j = 0; j < i; j++) {
-						expect(uVal[i][j]).to.equal(0.0);
-					}
-				}
-				done();
-			});
-		});
 		for (var i = 0; i < dataTypes.length; i++) {
 			(function(dataType) {
-				it("Produces a Cholesky decomposition (" + dataType + " data type)", function(done) {
-					var x = context.array(xRef, new furious.DataType(dataType));
+				it("produces correct L matrix (" + dataType + " data type)", function(done) {
+					var x = context.array(xRef);
 					var lup = context.lupdecomposition(x);
 					var l = lup[0];
-					var u = lup[1];
-					var p = lup[2];
 					l.get(function(lVal) {
 						for (var i = 0; i < l.shape[0]; i++) {
 							for (var j = 0; j < l.shape[1]; j++) {
@@ -1713,18 +1684,36 @@ describe("Context", function(){
 						}
 						done();
 					});
+				});
+			})(dataTypes[i]);
+		}
+		for (var i = 0; i < dataTypes.length; i++) {
+			(function(dataType) {
+				it("produces correct U matrix (" + dataType + " data type)", function(done) {
+					var x = context.array(xRef);
+					var lup = context.lupdecomposition(x);
+					var u = lup[1];
 					u.get(function(uVal) {
-						for (var i = 0; i < l.shape[0]; i++) {
-							for (var j = 0; j < l.shape[1]; j++) {
-								expect(uVal[i][j]).to.be.closeTo(uRef[i][j], Math.abs(uRef[i][j]) * 10.0 * l.dataType.epsilon);
+						for (var i = 0; i < u.shape[0]; i++) {
+							for (var j = 0; j < u.shape[1]; j++) {
+								expect(uVal[i][j]).to.be.closeTo(uRef[i][j], Math.abs(uRef[i][j]) * 10.0 * u.dataType.epsilon);
 							}
 						}
 						done();
 					});
+				});
+			})(dataTypes[i]);
+		}
+		for (var i = 0; i < dataTypes.length; i++) {
+			(function(dataType) {
+				it("produces correct P matrix (" + dataType + " data type)", function(done) {
+					var x = context.array(xRef);
+					var lup = context.lupdecomposition(x);
+					var p = lup[2];
 					p.get(function(pVal) {
-						for (var i = 0; i < l.shape[0]; i++) {
-							for (var j = 0; j < l.shape[1]; j++) {
-								expect(pVal[i][j]).to.be.closeTo(pRef[i][j], Math.abs(pRef[i][j]) * 10.0 * l.dataType.epsilon);
+						for (var i = 0; i < p.shape[0]; i++) {
+							for (var j = 0; j < p.shape[1]; j++) {
+								expect(pVal[i][j]).to.be.closeTo(pRef[i][j], Math.abs(pRef[i][j]) * 10.0 * p.dataType.epsilon);
 							}
 						}
 						done();
