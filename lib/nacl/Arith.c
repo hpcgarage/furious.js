@@ -2627,16 +2627,124 @@ static void dotF64(size_t aStride, size_t bOuterStride, size_t bInnerStride, siz
 }
 
 static void lupdecompositionF32(size_t n, float dataL[restrict static n*n], float dataU[restrict static n*n], float dataP[restrict static n*n]) {
-	// TODO: Implement
-	for (int i = 0; i < n*n; i++) {
-		dataL[i] = dataU[i] = dataP[i] = 98.71;
+	// Zero the output matrices
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			dataU[i*n + j] = 0;
+			dataP[i*n + j] = 0;
+		}
+		dataP[i*n + i] = 1;
+	}
+
+	for (int i = 0; i < n; i++) {
+		int jMax = i;
+		for (int j = i; j < n; j++) {
+			if (fabs(dataL[j*n + i]) > fabs(dataL[jMax*n + i])) 
+				jMax = j;
+		}
+		if (jMax != i) {
+			for (int k = 0; k < n; k++) {
+				float tmp = dataP[i*n + k];
+				dataP[i*n + k] = dataP[jMax*n + k];
+				dataP[jMax*n + k] = tmp;
+			}
+		}
+	}
+
+	float* Aprime = (float*)malloc(sizeof(float) * n * n);
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			for (int k = 0; k < n; k++) {
+				Aprime[i*n + j] += dataP[i*n + k] * dataL[k*n + j];
+			}
+		}
+	}
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			dataL[i*n + j] = 0;
+		}
+		dataL[i*n + i] = 1;
+	}
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			float s;
+			if (j <= i) {
+				s = 0;
+				for (int k = 0; k < j; k++) {
+					s += dataL[j*n + k] * dataU[k*n + i];
+				}
+				dataU[j*n + i] = Aprime[j*n + i] - s;
+			}
+			if (j >= i) {
+				s = 0;
+				for (int k = 0; k < j; k++) {
+					s += dataL[j*n + k] * dataU[k*n + i];
+				}
+				dataL[j*n + i] = (Aprime[j*n + i] - s) / dataU[i*n + i];
+			}
+		}
 	}
 }
 
 static void lupdecompositionF64(size_t n, double dataL[restrict static n*n], double dataU[restrict static n*n], double dataP[restrict static n*n]) {
-	// TODO: Implement
-	for (int i = 0; i < n*n; i++) {
-		dataL[i] = dataU[i] = dataP[i] = 98.71;
+	// Zero the output matrices
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			dataU[i*n + j] = 0;
+			dataP[i*n + j] = 0;
+		}
+		dataP[i*n + i] = 1;
+	}
+
+	for (int i = 0; i < n; i++) {
+		int jMax = i;
+		for (int j = i; j < n; j++) {
+			if (fabs(dataL[j*n + i]) > fabs(dataL[jMax*n + i])) 
+				jMax = j;
+		}
+		if (jMax != i) {
+			for (int k = 0; k < n; k++) {
+				double tmp = dataP[i*n + k];
+				dataP[i*n + k] = dataP[jMax*n + k];
+				dataP[jMax*n + k] = tmp;
+			}
+		}
+	}
+
+	double* Aprime = (double*)malloc(sizeof(float) * n * n);
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			for (int k = 0; k < n; k++) {
+				Aprime[i*n + j] += dataP[i*n + k] * dataL[k*n + j];
+			}
+		}
+	}
+
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			dataL[i*n + j] = 0;
+		}
+		dataL[i*n + i] = 1;
+	}
+	for (int i = 0; i < n; i++) {
+		for (int j = 0; j < n; j++) {
+			double s;
+			if (j <= i) {
+				s = 0;
+				for (int k = 0; k < j; k++) {
+					s += dataL[j*n + k] * dataU[k*n + i];
+				}
+				dataU[j*n + i] = Aprime[j*n + i] - s;
+			}
+			if (j >= i) {
+				s = 0;
+				for (int k = 0; k < j; k++) {
+					s += dataL[j*n + k] * dataU[k*n + i];
+				}
+				dataL[j*n + i] = (Aprime[j*n + i] - s) / dataU[i*n + i];
+			}
+		}
 	}
 }
 

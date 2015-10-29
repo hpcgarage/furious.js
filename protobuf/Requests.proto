@@ -212,9 +212,9 @@ message DotOperationRequest {
 
 message LUPDecompositionRequest {
 	required sfixed32             id_a   = 1;
-	required fixed32              id_outL = 2;
-	required fixed32              id_outU = 3;
-	required fixed32              id_outP = 4;
+	required fixed32              id_outl = 2;
+	required fixed32              id_outu = 3;
+	required fixed32              id_outp = 4;
 }
 
 message CholeskyDecompositionRequest {
