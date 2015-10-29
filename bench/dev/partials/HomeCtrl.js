@@ -263,4 +263,30 @@ angular.module('furiousBM.controllers')
         }
     }
 
+    $scope.logF32 = [];
+    var testLogF32Helper = function testLogF32Helper(backEnd) {
+        furious.init(backEnd, function(context) {
+            var y = (context.array([10, 11, 12, 13, 14, 15, 16, 17], f32Type)).retain();
+            var x = context.log(y);
+            context.barrier(function() {
+                console.log(backEnd);
+                context.fetch(x, function(jsx) {
+                    console.log(jsx);
+                    $scope.logF32.push(jsx);
+                    $scope.$apply();
+                })
+            })
+        })
+    }
+    $scope.testLogF32 = function testLogF32() {
+        for (var i = 0, limit = $scope.backEndOptions.length; i < limit; i++) {
+            var backEnd = $scope.backEndOptions[i];
+            $scope.series[i] = backEnd;
+            try{
+                testLogF32Helper(backEnd);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
 }]);
