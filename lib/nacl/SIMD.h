@@ -53,7 +53,8 @@ inline v4sf v4sf_min(v4sf x, v4sf y) {
     return v4sf_blendv(x, y, x > y);
 }
 
-inline v4sf v4sf_GET_INFINITY() {
-    return v4sf_set1(__builtin_inff());
-}
+// inline v4sf v4sf_GET_INFINITY() {
+//     return v4sf_set1(__builtin_inff());
+// }
 v4sf exp_v4sf(v4sf x);
+v4sf log_v4sf(v4sf x);

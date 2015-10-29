@@ -1921,14 +1921,25 @@ static void exp2F64(size_t length, const double dataA[static length], double dat
 static void logF32(size_t length, const float dataA[static length], float dataOut[static length]) {
 	if (dataOut == dataA) {
 		/* In-place operation: out[i] = log(out[i]) */
-		while (length--) {
-			*dataOut = logf(*dataOut);
+		while(length >= 4) {
+			v4sf_store(dataOut, (log_v4sf(v4sf_load(dataOut))));
+			dataOut += 4;
+			length -= 4;
+		}
+		while(length--) {
+			*dataOut = expf(*dataOut);
 			dataOut++;
 		}
 	} else {
 		/* Non-destructive operation: out[i] = log(a[i]) */
-		while (length--) {
-			*dataOut++ = logf(*dataA++);
+		while(length >= 4) {
+			v4sf_store(dataOut, (log_v4sf(v4sf_load(dataA))));
+			dataOut += 4;
+			dataA += 4;
+			length -= 4;
+		}
+		while(length--) {
+			*dataOut++ = expf(*dataA++);
 		}
 	}
 }
