@@ -289,4 +289,57 @@ angular.module('furiousBM.controllers')
             }
         }
     }
+
+    $scope.maxF32 = [];
+    var testMaxF32Helper = function testMaxF32Helper(backEnd) {
+        furious.init(backEnd, function(context) {
+            var y = (context.array([10, 11, 12, 13, 14, 15, 16, 17], f32Type)).retain();
+            var x = y.max();
+            context.barrier(function() {
+                console.log(backEnd);
+                context.fetch(x, function(jsx) {
+                    console.log(jsx);
+                    $scope.maxF32.push(jsx);
+                    $scope.$apply();
+                })
+            })
+        })
+    }
+    $scope.testMaxF32 = function testMaxF32() {
+        for (var i = 0, limit = $scope.backEndOptions.length; i < limit; i++) {
+            var backEnd = $scope.backEndOptions[i];
+            $scope.series[i] = backEnd;
+            try{
+                testMaxF32Helper(backEnd);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
+    $scope.minF32 = [];
+    var testMinF32Helper = function testMinF32Helper(backEnd) {
+        furious.init(backEnd, function(context) {
+            var y = (context.array([10, 11, 12, 13, 14, 15, 16, 17], f32Type)).retain();
+            var x = y.min();
+            context.barrier(function() {
+                console.log(backEnd);
+                context.fetch(x, function(jsx) {
+                    console.log(jsx);
+                    $scope.minF32.push(jsx);
+                    $scope.$apply();
+                })
+            })
+        })
+    }
+    $scope.testMinF32 = function testMinF32() {
+        for (var i = 0, limit = $scope.backEndOptions.length; i < limit; i++) {
+            var backEnd = $scope.backEndOptions[i];
+            $scope.series[i] = backEnd;
+            try{
+                testMinF32Helper(backEnd);
+            }catch(e){
+                console.log(e);
+            }
+        }
+    }
 }]);
