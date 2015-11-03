@@ -53,6 +53,21 @@ inline v4sf v4sf_min(v4sf x, v4sf y) {
     return v4sf_blendv(x, y, x > y);
 }
 
+inline float v4sf_min_elem(v4sf x) {
+    float min = x[0];
+    for (int i = 1; i < 4; ++i) {
+        min = x[i] < min ? x[i] : min;
+    }
+    return min;
+}
+
+inline float v4sf_max_elem(v4sf x) {
+    float max = x[0];
+    for (int i = 1; i < 4; ++i) {
+        max = x[i] > max ? x[i] : max;
+    }
+    return max;
+}
 // inline v4sf v4sf_GET_INFINITY() {
 //     return v4sf_set1(__builtin_inff());
 // }

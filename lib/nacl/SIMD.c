@@ -67,7 +67,7 @@ v4sf log_v4sf(v4sf x) {
     const v4sf ln2_hi = v4sf_set1( 0x1.62E430p-1f);
     const v4sf ln2_lo = v4sf_set1(-0x1.05C610p-29f);
 
-    const v4sf mantissaMask = __builtin_convertvector(v4i_set1(0x007FFFFF), v4sf);
+    const v4sf mantissaMask = (v4sf)v4i_set1(0x007FFFFF);
     const v4i minExponent   = v4i_set1(0x00800000);
 
     const v4sf nan = v4sf_set1(__builtin_nanf(""));

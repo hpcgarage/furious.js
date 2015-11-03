@@ -2486,12 +2486,18 @@ static void minF32(size_t length, const float data[restrict static length], floa
 	if (length == 0) {
 		*minOut = __builtin_nanf("");
 	} else {
-		float min = *data++;
+		v4sf min = v4sf_load(data);
+		while (length >= 8) {
+			data += 4;
+			min = v4sf_min(min, v4sf_load(data));
+			length -= 4;
+		}
+		float res = v4sf_min_elem(min);
 		while (--length) {
 			const float val = *data++;
-			min = min < val ? min : val;
+			res = res < val ? res : val;
 		}
-		*minOut = min;
+		*minOut = res;
 	}
 }
 
@@ -2512,12 +2518,18 @@ static void maxF32(size_t length, const float data[restrict static length], floa
 	if (length == 0) {
 		*maxOut = __builtin_nanf("");
 	} else {
-		float max = *data++;
-		while (--length) {
-			const float value = *data++;
-			max = max < value ? value : max;
+		v4sf max = v4sf_load(data);
+		while (length >= 8) {
+			data += 4;
+			max = v4sf_max(max, v4sf_load(data));
+			length -= 4;
 		}
-		*maxOut = max;
+		float res = v4sf_max_elem(max);
+		while (--length) {
+			const float val = *data++;
+			res = res > val ? res : val;
+		}
+		*maxOut = res;
 	}
 }
 
