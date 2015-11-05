@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <string.h>
 
-void createArrayData64(double *arr, size_t size, double *buf) {
-	memcpy(arr, buf, 8 * size);
+size_t i;
+
+void add64(double *a, double *b, double *c, size_t n) {
+	for (i = 0; i < n; i++) c[i] = a[i] + b[i];
 }
 
-void createArrayData32(float *arr, size_t size, float *buf) {
-	memcpy(arr, buf, 4 * size);
+void sub(double *a, double *b, double *c, size_t n) {
+	for (i = 0; i < n; i++) c[i] = a[i] + b[i];
 }
+
+
