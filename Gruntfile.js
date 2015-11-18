@@ -123,7 +123,7 @@ module.exports = function(grunt) {
 				command: "python configure.py"
 			},
 			emcc: {
-				command: "emcc lib/asmjs/AsmJSWorker.c -o furious-asmjs-worker.js -s EXPORTED_FUNCTIONS=\"['_createConstArray', '_fillDiag']\" --post-js furious-asmjs-worker.js"
+				command: "emcc lib/asmjs/AsmJSWorker.c -o furious-asmjs-worker.js -s EXPORTED_FUNCTIONS=\"['_createConstArray', '_fillDiag', '_linspace', '_add', '_sub', '_mul', '_mdiv', '_addConst', '_subConst', '_subRevConst', '_mulConst', '_divConst', '_divRevConst']\" --post-js furious-asmjs-worker.js"
 			},
 			build: {
 				command: "ninja"
