@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<title>Ridge Regression</title>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+  	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
+  	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src="../furious.js"></script>
+	<script src="graph.js"></script>
+	<style type="text/css">
+	    .axis path {
+	        fill: none;
+	        stroke: black;
+	        shape-rendering: crispEdges;
+      	}
+	    .axis text {
+	        font-family: sans-serif;
+	        font-size: 11px;
+	    }
+		text {
+		    font-family: Arial;
+		    font-size: 9pt;
+		}
+		.bold {
+			font-weight: bold;
+		}
+		#label {
+			font-size: 0.9em;
+			text-align: center;
+			font-weight: bold;
+			padding-top: 5px;
+		}
+		#labelb {
+			font-size: 0.9em;
+			text-align: center;
+			font-weight: bold;
+			padding-top: 5px;;
+			margin-left: 20%;
+			float: left;
+		}
+		#visualisation {
+			text-align: center;
+			margin-top: -40px;
+			margin-left: 5%;
+		}
+		#run{
+/*			text-align: center;*/
+			font-weight: bold;
+			font-size: 1.2em;
+			margin-top: 0px;
+			width: 100%;
+		}
+		.infolabel{
+			float: right;
+			font-weight: bold;
+		}
+		.infolabel2{
+			float: left;
+			font-weight: bold;
+		}
+		.info{
+			font-weight: normal;
+		}
+	  #feedback { font-size: 1.4em; }
+	  #selectable .ui-selecting { background: #FECA40;}
+	  #selectable .ui-selected { background: #F39814; color: white; }
+	  #selectable { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+	  #selectable li { margin: 3px; padding: 0.4em; font-size: 1em; height: 18px; display: inline; text-align:center;}
+	</style>
+  <script>
+
+  </script>
+  </head>
+  <body onload="firstInit()">
+	    <div class="container">
+	    	<div class="page-header bold">
+  				<h1 class="bold">Ridge Regression <small>Forex Libor</small></h1>
+			</div>
+			<p class="infolabel">Selected Backend:&nbsp<span class="info" id="current">Default</span></p>
+			<p class="infolabel2">Time per Computation:&nbsp<span class="info" id="currenttime">0</span></p>
+	        <div class="jumbotron">
+				<svg id="visualisation" width="1000" height="400"></svg>
+				<div id="slider"></div>
+				<p id="label">Adjust Lambda to affect Ridge</p>
+				<p id="labelb">Select Backend: </p>
+			<ol id="selectable">
+			  <li class="ui-widget-content" data-userid="pnacl">Portable Native Client</li>
+			  <li class="ui-widget-content" data-userid="javascript">Javascript</li>
+			  <li class="ui-widget-content" data-userid="2">Asm.JS</li>
+			  <li class="ui-widget-content" data-userid="webcl">Web CL</li>
+			  <li class="ui-widget-content" data-userid="websocket">Web Socket</li>
+			</ol>
+			<button id="run">Rerun</button>
+	        </div>
+	
+
+
+	    </div>
+		<script type="text/javascript">
+			// var obj = objectify(x,y,cols);
+			var firsttime = 1;
+			var yarr = null;
+			context = null;
+			var options = {};
+			var svg = d3.select("#visualisation")
+			    .append("svg")
+			    .attr("width", 1000)
+			    .attr("height", 600);
+			var plotter = new graph(svg);
+
+			//Initialize a backend to start
+			/* Request a new context to be created */
+			// furious.init("pnacl", function(ctx) {
+			// 	context = ctx;
+			// 	console.log(context);
+			// 	dataClean(0); 
+			// });
+
+			var start = 0;
+			var end = 0;
+			var time = 0;
+
+			var usd_eur_rate_ND = null;
+			var usd_3m_libor_ND = null;
+			var eur_3m_euribor_ND = null;
+			var usd_eur_3m_spread_ND = null;
+			var ones = null;
+			var x = null;
+			var xx = null;
+			var xxx = null;
+			var BigXnd = null;
+
+			function firstInit() {
+				furious.init(function(ctx) {
+					context = ctx;
+					console.log(context);
+					dataClean(0); 
+				});				
+			}
+
+			function deallocate() {
+				if(usd_3m_libor_ND) {
+					usd_3m_libor_ND.invalidate();
+					usd_3m_libor_ND = null;
+				}
+				if(usd_eur_rate_ND) {
+					usd_eur_rate_ND.invalidate();
+					usd_eur_rate_ND = null;
+				}
+				if(eur_3m_euribor_ND) {
+					eur_3m_euribor_ND.invalidate();
+					eur_3m_euribor_ND = null;
+				}
+				if (usd_eur_3m_spread_ND) {
+					usd_eur_3m_spread_ND.invalidate();
+					usd_eur_3m_spread_ND = null;
+				}
+				if(ones) {
+					ones.invalidate();
+					ones = null;
+				}
+				if(x) {
+					x.invalidate();
+					x = null;
+				}
+				if(xx) {
+					xx.invalidate();
+					xx = null;
+				}
+				if(xxx) {
+					xxx.invalidate();
+					xxx = null;
+				}
+				if(BigXnd) {
+					BigXnd.invalidate();
+					BigXnd = null;
+				}
+			}
+
+			function dataClean(l) {
+				d3.csv("./numpy/forex-libor.csv", function(data) {
+					console.log(data[0]);
+					var key = (Object.keys(data[0])[0]);
+					var fed = [];
+					var ebr = [];
+					var feddate = [];
+					var ebrdate = [];
+					for(var i = 0; i < data.length; i++) {
+						var temp = [];
+						var temp2 = [];
+						Object.keys(data[i]).forEach(function (key) {
+						 	temp.push(data[i][key]);
+						});
+						temp2.push(temp[3]);
+						temp2.push(temp[4]);
+						temp.splice(3,2);
+						if (isFloatFed(temp)) {
+							fed.push(temp);		
+							feddate.push(temp[0]);				
+						};
+						// console.log(temp2[1]);
+						if (isFloatEbr(temp2)) {
+							ebr.push(temp2);
+							ebrdate.push(temp2[0]);							
+						};	
+					}
+					var dates = intersect(feddate,ebrdate).sort();
+					var usd_eur_rate = [];
+					var usd_3m_libor = [];
+					var eur_3m_euribor = [];
+					for(var j = 0; j < dates.length; j++) {
+						usd_eur_rate.push(parseFloat(fed[feddate.indexOf(dates[j])][1]));
+						usd_3m_libor.push(parseFloat(fed[feddate.indexOf(dates[j])][2]));
+						eur_3m_euribor.push(parseFloat(ebr[ebrdate.indexOf(dates[j])][1]));
+					}
+					//var usd_eur_3m_spread = usd_3m_libor - eur_3m_euribor;
+					console.log(fed.length);
+					// console.log(usd_eur_3m_spread.length);
+					if (context) {
+						usd_eur_rate_ND = context.array(usd_eur_rate).lock();
+						usd_3m_libor_ND = context.array(usd_3m_libor).lock();
+						eur_3m_euribor_ND = context.array(eur_3m_euribor).lock();
+						usd_eur_3m_spread_ND = usd_3m_libor_ND.sub(eur_3m_euribor_ND).lock(); //subtracts eur_3m_euribor from usd_3m_libor
+						compute(usd_eur_rate_ND, usd_3m_libor_ND, eur_3m_euribor_ND, usd_eur_3m_spread_ND, l);
+					};
+
+				});
+			}
+			function compute(usd_eur_rate_ND, usd_3m_libor_ND, eur_3m_euribor_ND, usd_eur_3m_spread_ND, l) {
+				start = new Date().getTime();
+				var datapoints = usd_eur_3m_spread_ND.length;
+				ones = context.ones(datapoints).lock();
+				x = usd_eur_3m_spread_ND.reshape([datapoints, 1]).lock();
+				xx = x.mul(x).lock();
+				xxx = xx.mul(x).lock();
+				BigXnd = context.empty(ones.length).lock();
+				var y = usd_eur_rate_ND;
+				// var l = 50;
+				context.get(ones, x, xx, xxx, usd_eur_3m_spread_ND, BigXnd, y, function(ones, x, xx, xxx, u, big, y) {
+					var usdeurspreadND = context.array(u);
+					for(var i = 0; i < ones.length; i++) {
+						var temp = [];
+						temp.push(ones[i]);
+						temp.push(x[i][0]);
+						temp.push(xx[i][0]);
+						temp.push(xxx[i][0]);
+						big[i] = (temp);
+						temp = [];
+					}
+					// var l = 50;
+					BigXnd = context.array(big).lock();
+					var bigT = [];
+					for (var i = 0; i < 4; i++) {
+						var temp = [];
+						for (var j = 0; j < big.length; j++) {
+							temp.push(big[j][i]);							
+						}
+						bigT.push(temp);
+					}
+					BigXndT = context.array(bigT).lock();
+					var eye = context.eye(big[0].length);
+					var XTX = context.dot(BigXndT, BigXnd);
+					//XTX + l * numpy.eye(X.shape[1])
+				    var XTXmul = context.mul(l, eye);
+					var parameterCholesky = context.add(XTX, XTXmul);
+					//L is transposed for some reason
+					var L = context.cholesky(parameterCholesky).lock();
+					var y = context.array(y);
+					var xnd = context.array(x);
+					context.get(L, y, BigXndT, BigXnd, xnd, usdeurspreadND, function(l, y, b, X, xnd, u) {
+						var xpass = context.array(xnd);
+						usdeur3m = context.array(u);
+						usdeurrate = context.array(y);
+						var LT = [];
+						for (var i = 0; i < l[0].length; i++) {
+							var temp = [];
+							for (var j = 0; j < l.length; j++) {
+								temp.push(l[j][i]);							
+							}
+							LT.push(temp);
+						}
+						var BigXndT = context.array(b); 
+						var y = context.array(y);
+						var BigXnd = context.array(X);
+						LTND = context.array(LT).lock();
+						secondsecondparam = context.dot(BigXndT, y);
+						secondparam = context.solveTriangular(LTND, secondsecondparam, 'L');
+						beta = context.solveTriangular(LTND, secondparam, 'L', 'T');
+						y_hat = context.dot(BigXnd, beta);
+						context.get(usdeur3m, usdeurrate, xpass, y_hat, function(a, b, c, d) {
+							plot(a,b,c,d);
+						});
+					})
+				});
+			}
+
+			function plot(usd_eur_3m_spread, usd_eur_rate, x, y_hat) {	
+			  if(firsttime == 1) {
+		      	plotter.setStatic(usd_eur_3m_spread, usd_eur_rate, x, y_hat);
+			  	firsttime = 0;
+			  } else {
+			  	plotter.updateLine(usd_eur_3m_spread, usd_eur_rate, x, y_hat);
+			  }     
+				end = new Date().getTime();
+				time = end - start;
+				$("#currenttime").html(time);
+			}
+			function isFloatFed(row){
+				return !isNaN(parseFloat(row[1])) && !isNaN(parseFloat(row[2]));
+			}
+			function isFloatEbr(row){
+				return !isNaN(parseFloat(row[1]));
+			}
+			function intersect(a, b) {
+			    var t;
+			    if (b.length > a.length) t = b, b = a, a = t; // indexOf to loop over shorter
+			    return a.filter(function (e) {
+			        if (b.indexOf(e) !== -1) return true;
+			    });
+			}
+			function maxmin(arr) {
+				var max = 0;
+				var min = 1000;
+			    for (var i = 0; i < arr.length; i++) {
+			    	if(!isNaN(parseFloat(arr[i]))) {
+				        if (arr[i] > max) {
+				            max = arr[i];
+				        } else if (arr[i] < min) {
+				        	min = arr[i];
+				        }
+			    	}
+			    }
+			    var ret = [min, max];
+				return ret;
+			}
+			$(function() {
+			    $( "#slider" ).slider({
+			    	  min: 0,
+			    	  max: 200,
+					    slide: function(event, ui) { 
+					        console.log(ui.value);
+					        // dataClean(ui.value);
+					        l = ui.value;
+							compute(usd_eur_rate_ND, usd_3m_libor_ND, eur_3m_euribor_ND, usd_eur_3m_spread_ND, l)
+					    } 
+			    });
+			});;
+			$(function() {
+			    $( "#selectable" ).selectable();
+			});
+			$('button').click(function() {
+			    var ids = $('#selectable .ui-selected').map(function() {
+			        return $(this).data('userid');
+			    });
+			    console.log(ids.toArray()[0]);
+			    $("#current").html(ids.toArray()[0]);
+			    deallocate();
+				furious.init(ids.toArray()[0], function(ctx) {
+					context = ctx;
+					console.log(context);
+					dataClean(0); 
+				});
+
+			});
+		</script>
+  </body>
+</html>

@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html>
+  <head>
+	<!--<meta http-equiv="cache-control" content="no-cache" />
+	<meta http-equiv="pragma" content="no-cache" />
+	<meta http-equiv="expires" content="0" />-->
+	<title>Pi</title>
+	<script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<link href="http://getbootstrap.com/dist/css/bootstrap.min.css" rel="stylesheet">
+	<script src="../furious.js"></script>
+	<!--<link type="text/css" rel="stylesheet" href="reset.css" media="all"></link>
+	<link type="text/css" rel="stylesheet" href="grid960.css" media="all"></link>-->
+	<style type="text/css">	
+		text {
+		    font-family: Arial;
+		    font-size: 9pt;
+		}
+		.bold {
+			font-weight: bold;
+		}
+	</style>
+  </head>
+  <body>
+	    <div class="container">
+	    	<div class="page-header bold">
+  				<h1 class="bold">Pi <small>Simple Linear Graph</small></h1>
+			</div>
+	        <div class="jumbotron">
+				<svg id="visualisation" width="1000" height="400"></svg>
+	        </div>	
+	 
+	    </div>
+		<script type="text/javascript">
+			function objectify(x,y,cols) {
+				var obj = [];
+				var thing = {};
+				for(var i = 0; i < x.length; i++){
+					thing = {};
+			        for(var j = 0; j < cols.length; j++){
+			            if (j == 0) {
+			                thing[cols[j]] = x[i];
+			            } else {
+			            	thing[cols[j]] = y[i];
+			            };
+			        }
+	              	obj[i] = thing;
+	       		}		
+	       		return obj;		
+			}
+			// var obj = objectify(x,y,cols);
+			var yarr = null;
+			context = null;
+			var options = {};
+			//Initialize a backend to start
+			/* Request a new context to be created */
+			furious.init(function(ctx) {
+				context = ctx;
+				var x = [0,3,5,6,7,8,9,10,12,14,16,17,20];
+				var y = [1,6,2,7,5,2,1,3,8,9,2,5,7];
+				var cols = ["x","y"];
+				console.log(context);
+				furiousCompute(x,y,cols);
+			});
+
+			function furiousCompute(x,y,cols) {
+				if (context && x && y && cols) {		
+					var xND = context.array(x);			
+					console.log(xND);
+					var obj = objectify(x,y,cols);
+					var yND = xND.mul(3);
+					context.get(yND, function(y) {
+						var object = objectify(x,y,cols);
+						plot(object);
+						console.log(y);
+					});
+				}
+			}
+			function plot(obj) {
+				var data = obj,
+				w = 1000,
+				h = 400,
+				margin = 30,
+				//domain is the actual values for x and y whereas the range is how those values are plotted
+				y = d3.scale.linear().domain([0, d3.max(data, function(d) {return d.y;})]).range([h - margin, 0 + margin]),
+				x = d3.scale.linear().domain([0, d3.max(data, function(d) {return d.x;})]).range([0 + margin, w - margin])
+				var vis = d3.select("#visualisation"),
+					WIDTH = w,
+					HEIGHT = h,
+					MARGINS = {
+						top: margin,
+						right: margin,
+						bottom: margin,
+						left: margin
+					}
+				xAxis = d3.svg.axis().scale(x);
+				yAxis = d3.svg.axis().scale(y).orient("left");
+				vis.append("svg:g").attr("transform","translate(0," + (h - margin) + ")").attr("stroke","black").attr("fill","none").attr("stroke-width",1.2).call(xAxis);
+				vis.append("svg:g").attr("transform", "translate(" + (margin) + ",0)").attr("stroke","black").attr("fill","none").attr("stroke-width",1.2).call(yAxis);
+				var lineGen = d3.svg.line()
+				  .x(function(d) {
+				    return x(d.x);
+				  })
+				  .y(function(d) {
+				    return y(d.y);
+				  });
+				vis.append('svg:path')
+				  .attr('d', lineGen(data))
+				  .attr('stroke', 'steelblue')
+				  .attr('stroke-width', 2)
+				  .attr("shape-rendering","crispEdges")
+				  .attr('fill', 'none');
+			    var point = vis.append("g")
+			        .attr("class", "line-point");
+
+			        point.selectAll('circle')
+			        .data(data)
+			        .enter().append('circle')
+			        .attr("cx", function(d) {
+			        	console.log(x(d.x));
+			            return x(d.x)
+			          })
+			         .attr("cy", function(d) { 
+			         	return y(d.y) 
+			         })
+			         .attr("r", 2)
+
+			    vis.append("line")
+			    	.attr("class","x")
+			    	.style("stroke","black")
+			    	.style("stroke-dasharray","3,3")
+			        .style("opacity", 0.5)
+			        .attr("y1", 0)
+			        .attr("y2", 0);
+
+			    vis.append("line")
+			    	.attr("class","y")
+			    	.style("stroke","black")
+			    	.style("stroke-dasharray","3,3")
+			        .style("opacity", 0.5)
+			        .style("",margin)
+			        .attr("x1", 0)
+			        .attr("x2", 0);	
+
+			    vis.append("circle")
+			    	.attr("class","y")
+			    	.style("fill","none")
+			    	.style("stroke", "black")
+			    	.attr("cx",-10)
+			    	.attr("cy",0)
+			    	.attr("r",4);	
+
+			    vis.append("text")
+			        .attr("class", "y1")
+			        .style("stroke", "white")
+			        .style("stroke-width", "3.5px")
+			        .style("opacity", 0.8)
+			        .attr("dx", 8)
+			        .attr("dy", "-.3em");
+			    vis.append("text")
+			        .attr("class", "y2")
+			        .attr("dx", 8)
+			        .attr("dy", "-.3em");
+
+			    vis.append("rect")
+			        .attr("width", w - margin)
+			        .attr("height", h - margin)
+			        .style("fill", "none")
+			        .style("pointer-events", "all")
+			        .on("start",function() {
+			        	vis.select(".x").style("display","none");
+			        })
+			        .on("mouseover", function() { 
+						vis.select(".x").style("display",null);
+						vis.select(".y").style("display",null);
+			        	vis.style("display", null); 
+			        })
+			        .on("mouseout",function(){
+			        	vis.select(".x").style("display","none");
+			        	vis.select(".y").style("display","none");
+			        })
+			        .on("mousemove", mousemove);
+
+			    function mousemove() {
+						vis.select(".x").style("display",null);
+						vis.select(".y").style("display",null);
+			      var bisectDate = d3.bisector(function(d) { return d.x; }).left;
+					var x0 = x.invert(d3.mouse(this)[0]),
+					    i = bisectDate(data, x0),
+					    d0 = data[i - 1],
+					    d1 = data[i],
+					    d = x0 - d0.x > d1.x - x0 ? d1 : d0;
+					    console.log(d);
+
+					vis.select("circle.y")
+					    .attr("transform",
+					          "translate(" + (10 + x(d.x)) + "," +
+					                         y(d.y) + ")");
+
+					vis.select("text.y1")
+					    .attr("transform",
+					          "translate(" + x(d.x) + "," +
+					                         y(d.y) + ")")
+					    .text(d.y);
+
+					vis.select("text.y2")
+					    .attr("transform",
+					          "translate(" + x(d.x) + "," +
+					                         y(d.y) + ")")
+					    .text(d.y);
+
+					vis.select(".x")
+					    .attr("transform",
+					          "translate(" + x(d.x) + "," +
+					                         y(d.y) + ")")
+					    .attr("y2", h - margin - y(d.y));
+
+					vis.select(".y")
+					    .attr("transform",
+					          "translate(" + (w - margin) * -1 + "," +
+					                         (y(d.y)) + ")")
+					   	.attr("x1",margin)
+					    .attr("x2", w + w - 2*margin);
+				}
+
+			}
+
+
+		</script>
+  </body>
+</html>

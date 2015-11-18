@@ -5,9 +5,7 @@ import string
 
 datafile = open("forex-libor.csv", "r")
 data = datafile.readlines()
-# Skip the header line
 data = data[1:]
-# Remove trailing end-of-line
 data = map(string.rstrip, data)
 data = map(lambda line: tuple(line.split(',')), data)
 fed_data = [(fed_date, usd_eur_rate, usd_3m_libor) for (fed_date, usd_eur_rate, usd_3m_libor, ebr_date, eur_3m_euribor) in data]
