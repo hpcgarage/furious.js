@@ -192,3 +192,56 @@ void divRevConst(void *a, double value, void *c, size_t type, size_t n) {
 		for (size_t i = 0; i < n; i++) out[i] = value / arr[i];
 	}
 }
+
+void sum(void *a, void *c, size_t type, size_t n) {
+	double res = 0;
+	if (type == 1) {
+		float *arr = (float*) a;
+		float *out = (float*) c;
+		for (size_t i = 0; i < n; i++) res += arr[i];
+		out[0] = res;
+	} else if (type == 2) {
+		double *arr = (double*) a;
+		double *out = (double*) c;
+		for (size_t i = 0; i < n; i++) res += arr[i];
+		out[0] = res;
+	}
+}
+
+void min(void *a, void *c, size_t type, size_t n) {
+	double res = 0;
+	if (type == 1) {
+		float *arr = (float*) a;
+		float *out = (float*) c;
+		for (size_t i = 0; i < n; i++) res = MIN(arr[i],res);
+		out[0] = res;
+	} else if (type == 2) {
+		double *arr = (double*) a;
+		double *out = (double*) c;
+		for (size_t i = 0; i < n; i++) res = MIN(arr[i],res);
+		out[0] = res;
+	}
+}
+
+void max(void *a, void *c, size_t type, size_t n) {
+	double res = 0;
+	if (type == 1) {
+		float *arr = (float*) a;
+		float *out = (float*) c;
+		for (size_t i = 0; i < n; i++) res = MAX(arr[i],res);
+		out[0] = res;
+	} else if (type == 2) {
+		double *arr = (double*) a;
+		double *out = (double*) c;
+		for (size_t i = 0; i < n; i++) res = MAX(arr[i],res);
+		out[0] = res;
+	}
+}
+
+void axisMin(void *a, void *c, size_t out, size_t in, size_t dim, size_t n) {
+	if (type == 1) {
+	
+	} else if (type == 2) {
+
+	}	
+}
