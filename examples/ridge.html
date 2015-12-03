@@ -10,6 +10,8 @@
   	<link rel="stylesheet" href="https://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
   	<script src="https://code.jquery.com/jquery-1.10.2.js"></script>
   	<script src="https://code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
+	<script src='./nprogress/nprogress.js'></script>
+	<link rel='stylesheet' href='./nprogress/nprogress.css'/>
 	<script src="../furious.js"></script>
 	<script src="graph.js"></script>
 	<style type="text/css">
@@ -66,6 +68,13 @@
 		.info{
 			font-weight: normal;
 		}
+		#faded {
+			opacity: 1;
+			margin-top: -10px;
+		}
+		.notbold {
+			font-weight: normal;
+		}
 	  #feedback { font-size: 1.4em; }
 	  #selectable .ui-selecting { background: #FECA40;}
 	  #selectable .ui-selected { background: #F39814; color: white; }
@@ -82,8 +91,8 @@
   				<h1 class="bold">Ridge Regression <small>Forex Libor</small></h1>
 			</div>
 			<p class="infolabel">Selected Backend:&nbsp<span class="info" id="current">Default</span></p>
-			<p class="infolabel2">Time per Computation:&nbsp<span class="info" id="currenttime">0</span></p>
-	        <div class="jumbotron">
+			<p class="infolabel2">Time per Computation:&nbsp<span class="info" id="currenttime">0</span><span class="notbold"> ms</span></p>
+	        <div class="jumbotron" id="faded">
 				<svg id="visualisation" width="1000" height="400"></svg>
 				<div id="slider"></div>
 				<p id="label">Adjust Lambda to affect Ridge</p>
@@ -91,7 +100,7 @@
 			<ol id="selectable">
 			  <li class="ui-widget-content" data-userid="pnacl">Portable Native Client</li>
 			  <li class="ui-widget-content" data-userid="javascript">Javascript</li>
-			  <li class="ui-widget-content" data-userid="2">Asm.JS</li>
+			  <li class="ui-widget-content" data-userid="2" disabled>Asm.JS</li>
 			  <li class="ui-widget-content" data-userid="webcl">Web CL</li>
 			  <li class="ui-widget-content" data-userid="websocket">Web Socket</li>
 			</ol>
@@ -113,14 +122,6 @@
 			    .attr("height", 600);
 			var plotter = new graph(svg);
 
-			//Initialize a backend to start
-			/* Request a new context to be created */
-			// furious.init("pnacl", function(ctx) {
-			// 	context = ctx;
-			// 	console.log(context);
-			// 	dataClean(0); 
-			// });
-
 			var start = 0;
 			var end = 0;
 			var time = 0;
@@ -136,6 +137,8 @@
 			var BigXnd = null;
 
 			function firstInit() {
+				NProgress.start();
+				$("#faded").css('opacity', 0.3);
 				furious.init(function(ctx) {
 					context = ctx;
 					console.log(context);
@@ -309,6 +312,8 @@
 				end = new Date().getTime();
 				time = end - start;
 				$("#currenttime").html(time);
+				NProgress.done();
+				$("#faded").css('opacity', 1);
 			}
 			function isFloatFed(row){
 				return !isNaN(parseFloat(row[1])) && !isNaN(parseFloat(row[2]));
@@ -349,23 +354,27 @@
 							compute(usd_eur_rate_ND, usd_3m_libor_ND, eur_3m_euribor_ND, usd_eur_3m_spread_ND, l)
 					    } 
 			    });
-			});;
+			});
 			$(function() {
 			    $( "#selectable" ).selectable();
 			});
-			$('button').click(function() {
+			$('#run').click(function() {
 			    var ids = $('#selectable .ui-selected').map(function() {
 			        return $(this).data('userid');
 			    });
-			    console.log(ids.toArray()[0]);
-			    $("#current").html(ids.toArray()[0]);
-			    deallocate();
-				furious.init(ids.toArray()[0], function(ctx) {
-					context = ctx;
-					console.log(context);
-					dataClean(0); 
-				});
-
+			    if(ids.toArray()[0] == 'pnacl' || ids.toArray()[0] == 'javascript') {
+					NProgress.start();
+					$("#faded").css('opacity', 0.3);
+				    $("#current").html(ids.toArray()[0]);
+				    deallocate();
+					furious.init(ids.toArray()[0], function(ctx) {
+						context = ctx;
+						console.log(context);
+						dataClean(0); 
+					});			    	
+			    } else {
+			    	alert("That backend is currently not supported. Please choose another one.")
+			    }
 			});
 		</script>
   </body>
